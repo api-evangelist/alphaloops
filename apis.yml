@@ -1,0 +1,64 @@
+name: AlphaLoops FMCSA Carrier Data API
+description: >-
+  The carrier data layer for freight — FMCSA motor-carrier intelligence covering carrier profiles, authority & insurance
+  history, VIN-level fleet data, roadside inspections, crashes, corporate connections, decision-maker contacts, and
+  risk/watchlist monitoring. Exposes a REST API, a live OpenAPI 3.1 contract, a hosted MCP server with 30+ tools, and
+  published Python/TypeScript SDKs plus a CLI.
+url: https://alphaloops-fmcsa-carrier-data-api.apievangelist.com/apis.yml
+created: '2026-07-07'
+modified: '2026-07-07'
+specificationVersion: '0.21'
+tags:
+  - fmcsa api
+  - safer web api
+  - dot lookup
+  - carrier data
+  - freight
+  - trucking
+  - motor carrier
+  - fleet intelligence
+  - sales intelligence
+  - mcp server
+  - contact enrichment
+  - risk
+  - fraud
+apis:
+  - name: AlphaLoops FMCSA Carrier Data API
+    description: >-
+      REST API for FMCSA carrier data: lookup by DOT/MC/name, 200+-field profiles, authority & insurance history,
+      VIN-level fleet, roadside inspections & violations, crashes, news, corporate-connection graph, similar carriers,
+      contact search & enrichment, MC-authority and equipment-for-sale signals, and watchlists. Bearer-token auth;
+      endpoints under /v1/.
+    humanURL: https://runalphaloops.com/fmcsa-api/docs
+    baseURL: https://api.runalphaloops.com
+    tags:
+      - fmcsa api
+      - safer web api
+      - dot lookup
+      - carrier data
+      - freight
+      - trucking
+      - motor carrier
+      - fleet intelligence
+      - sales intelligence
+      - mcp server
+      - contact enrichment
+      - risk
+      - fraud
+    properties:
+      - type: OpenAPI
+        url: https://runalphaloops.com/openapi.json
+      - type: Documentation
+        url: https://runalphaloops.com/fmcsa-api/docs
+      - type: Documentation
+        url: https://runalphaloops.com/fmcsa-api/guide
+      - type: MCP
+        url: https://mcp-freight.runalphaloops.com/mcp
+maintainers:
+  - FN: AlphaLoops
+    url: https://runalphaloops.com
+generated:
+  by: apis.io/add
+  model: claude-opus-4-8
+  confidence: 92
+  at: '2026-07-07T13:54:21.644Z'
