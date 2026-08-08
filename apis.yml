@@ -64,7 +64,7 @@ apis:
         url: https://runalphaloops.com/fmcsa-api/docs
       - type: Documentation
         url: https://runalphaloops.com/fmcsa-api/guide
-      - type: MCP
+      - type: MCPServer
         url: https://mcp-freight.runalphaloops.com/mcp
 maintainers:
   - FN: AlphaLoops
