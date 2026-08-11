@@ -1,0 +1,170 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/mcp
+status: live
+description: >-
+  AlphaLoops operates a hosted, remote MCP server exposing its FMCSA carrier-data platform as
+  tools. The provider publishes a dedicated MCP reference page marked "Live" carrying the endpoint,
+  the transport, the auth model, the rate-limit tiers, a versioning policy and a categorised tool
+  inventory. Endpoint reachability, the auth challenge and the OAuth metadata below were probed
+  live on 2026-08-11.
+
+server:
+  name: AlphaLoops MCP Server
+  url: https://mcp-freight.runalphaloops.com/mcp
+  hosted: true
+  remote: true
+  local_install_required: false
+  client_config_type: url
+  transport: HTTPS + SSE (streamable HTTP supported for Python/TypeScript SDK clients)
+  auth: Bearer token (AlphaLoops API key, prefix al_)
+  documentation: https://runalphaloops.com/mcp
+  advertised_tool_count: '30+'
+  named_tool_count: 24
+  advertised_p50_latency: <100ms
+  carriers_covered: 2.7M
+
+# LIVE SCHEMA IS AUTH-GATED. tools/list was posted anonymously and returned 401 — so the tool
+# inputSchemas below are NOT reproduced here, because we do not have them and will not invent them.
+# The tool NAMES and CATEGORIES are read verbatim from the provider's own MCP reference page.
+# Their real parameters are recoverable two ways: an authenticated tools/list, or via the REST
+# operations they map onto — see mcp/alphaloops-tool-crosswalk.yml, which binds each tool to the
+# OpenAPI operation whose parameters it inherits.
+probe:
+  method: POST
+  url: https://mcp-freight.runalphaloops.com/mcp
+  body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+  accept: application/json, text/event-stream
+  http_status: 401
+  www_authenticate: 'Bearer authorization_uri="https://mcp-freight.runalphaloops.com/authorize"'
+  response_body: '{"error":"Missing Authorization header. Pass your AlphaLoops API key as: Authorization: Bearer al_..."}'
+  server: Vercel
+  probed_at: '2026-08-11'
+  verdict: gated
+  note: >-
+    Well-behaved gate — a real 401 with a standards-shaped WWW-Authenticate challenge naming the
+    authorization endpoint, plus a human-readable message stating the expected credential format.
+    Nothing here is a soft-200 or a redirect to a login page.
+
+oauth:
+  authorization_server_metadata: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
+  http_status: 200
+  file: ../well-known/alphaloops-oauth-authorization-server.json
+  issuer: https://mcp-freight.runalphaloops.com
+  dynamic_client_registration: https://mcp-freight.runalphaloops.com/oauth/register
+  pkce: S256
+  grant_types: [authorization_code, refresh_token]
+  scopes_supported: null
+  note: >-
+    Two credential paths coexist: a static Bearer API key (what the docs tell you to paste into
+    claude_desktop_config.json) and a full OAuth authorization-code + PKCE flow with open dynamic
+    client registration (what the well-known document describes). The documentation covers only the
+    first. /.well-known/oauth-protected-resource is NOT served — see well-known/alphaloops-well-known.yml.
+
+clients_documented:
+  - Claude Desktop
+  - Claude Code
+  - Cursor
+  - Windsurf
+  - VS Code (GitHub Copilot)
+  - Clay (Claygent)
+  - any MCP-compatible custom agent
+
+install:
+  claude_desktop:
+    file: claude_desktop_config.json
+    config:
+      mcpServers:
+        alphaloops:
+          type: url
+          url: https://mcp-freight.runalphaloops.com/mcp
+          headers:
+            Authorization: Bearer YOUR_API_KEY
+
+versioning:
+  scheme: header-pinned
+  header: X-AlphaLoops-Version
+  default: latest when the header is omitted
+  breaking_change_policy: New version, 90-day deprecation window on the prior version
+  additive_change_policy: Ships continuously without a version bump
+  source: https://runalphaloops.com/mcp
+
+errors:
+  model: JSON-RPC error codes plus AlphaLoops-specific codes
+  codes:
+    - {code: 400, meaning: validation error}
+    - {code: 401, meaning: authentication}
+    - {code: 402, meaning: insufficient credits}
+    - {code: 429, meaning: rate limited}
+  note: Errors include a human-readable message and a stable error code.
+
+# Rate-limit tiers as published ON THE MCP PAGE. These do NOT agree with the main pricing page or
+# the API docs — see plans/alphaloops-plans-pricing.yml and rate-limits/alphaloops-rate-limits.yml,
+# where the contradiction is recorded in full.
+tiers:
+  - name: Free
+    price: $0
+    requests: 1,000 per month
+    keys: single API key
+    intent: evaluation and small-scale agent prototypes
+  - name: Pro
+    price: from $499/mo
+    requests: 100K per month
+    keys: multiple API keys
+    includes: [Webhooks, SLA]
+    uptime_sla: 99.9%
+  - name: Enterprise
+    price: custom
+    requests: unlimited
+    includes: [multi-tenant key management, volume pricing, custom data agreements]
+
+# 24 tools named on the provider page across 6 categories, verbatim. The page headline says "30+",
+# so 6+ tools are advertised but not named publicly; the gap is recorded rather than filled.
+tool_count_discrepancy:
+  advertised: '30+'
+  named_on_page: 24
+  unnamed: '6+'
+  note: Only an authenticated tools/list can enumerate the remainder.
+
+tools:
+  - category: Lookup
+    label: Identity and authority
+    description: Resolve any DOT or MC. Full operational profile, authority history, BMC-91 filings.
+    advertised_count: 4
+    names: [carrier_lookup, carrier_lookup_by_mc, carrier_overview, carrier_authority]
+  - category: Search
+    label: Discovery and filtering
+    description: Filter the carrier graph by fleet size, geography, equipment, technology, growth, authority age.
+    advertised_count: 4
+    names: [carrier_search, carrier_filtered_query, carrier_similar, list_prospects]
+  - category: Score
+    label: ICP scoring and ranking
+    description: Rank by similarity to a reference set or natural-language criteria. ICP fit, risk, displacement value.
+    advertised_count: 3
+    names: [carrier_score, list_create, list_enrich]
+  - category: Safety
+    label: FMCSA, fleet, inspections
+    description: CSA BASICs, inspection history, crash records, OOS rates, VIN-level equipment, full tech stack.
+    advertised_count: 5
+    names: [inspections_list, inspection_violations, crashes_list, fleet_trucks, fleet_trailers]
+  - category: Risk
+    label: Fraud and risk signals
+    description: Consolidated risk scoring, chameleon detection, MC sale watchlist, equipment sale signals, federal litigation, AI-flagged signals.
+    advertised_count: 5
+    names: [carrier_risk_signals, carrier_connections, watchlist_mc_sales, watchlist_subscribe, carrier_news]
+  - category: Contact
+    label: Decision-makers
+    description: Verified emails and phones for owners, ops VPs, IT directors, CFOs across 2.7M carriers.
+    advertised_count: 3
+    names: [contacts_search, contact_enrich, contacts_enrich_bulk]
+
+evidence:
+  - url: https://runalphaloops.com/mcp
+    http_status: 200
+    note: Provider MCP reference page; tool inventory, tiers, versioning, FAQ.
+  - url: https://mcp-freight.runalphaloops.com/mcp
+    http_status: 401
+    note: tools/list gated; WWW-Authenticate challenge returned.
+  - url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
+    http_status: 200
+    note: RFC 8414 metadata served.

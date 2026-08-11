@@ -1,0 +1,13 @@
+generated: '2026-08-11'
+method: derived
+source: openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
+summary:
+  types:
+  - http
+schemes:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'
+  sources:
+  - openapi/alphaloops-fmcsa-carrier-data-api-openapi.json

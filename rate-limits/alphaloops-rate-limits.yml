@@ -1,0 +1,133 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/fmcsa-api/docs
+description: >-
+  Published rate limits for the AlphaLoops FMCSA Carrier Data API and the AlphaLoops MCP server.
+  The REST limits and the full response-header set are documented in the "Rate Limits" section of
+  the API reference; the MCP limits are published separately on the MCP reference page. THEY DO
+  NOT DESCRIBE THE SAME LADDER — see the contradiction block below.
+
+limit_count: 5
+
+# The runtime signal — this is what an agent actually needs, and AlphaLoops publishes it well.
+response_headers:
+  - name: X-RateLimit-Limit
+    meaning: Per-minute request ceiling
+    example: '60'
+  - name: X-RateLimit-Remaining
+    meaning: Requests left in the current minute window
+    example: '47'
+  - name: X-RateLimit-Reset
+    meaning: Unix epoch seconds when the per-minute window resets
+    example: '1709325600'
+  - name: X-DailyLimit-Limit
+    meaning: Per-day request ceiling
+    example: '5000'
+  - name: X-DailyLimit-Remaining
+    meaning: Requests left in the current day window
+    example: '4832'
+  - name: X-DailyLimit-Reset
+    meaning: Unix epoch seconds when the daily window resets
+    example: '1709337600'
+  - name: Retry-After
+    meaning: Seconds to wait before retrying
+    type: integer
+    declared_in: OpenAPI components.responses.RateLimited.headers
+  - name: X-Enrichment-Credits-Remaining
+    meaning: Enrichment credits left (contact enrichment is credit-metered, not rate-limited)
+    related_status: 402
+returned_on_every_response: true
+verbatim: 'Rate limit headers are included in every response'
+naming_note: >-
+  Custom X- prefixed headers rather than the RFC 9239 / draft-ietf-httpapi-ratelimit-headers
+  RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset form. Retry-After is standard.
+exhausted_status: 429
+exhausted_body: '{"error": "...", "message": "..."}'
+
+limits:
+  - id: rest-enterprise-per-minute
+    surface: REST
+    scope: per-key
+    window: 1 minute
+    limit: 60
+    burst: null
+    tier: Enterprise
+    source: https://runalphaloops.com/fmcsa-api/docs
+  - id: rest-enterprise-per-day
+    surface: REST
+    scope: per-key
+    window: 1 day
+    limit: 5000
+    burst: null
+    tier: Enterprise
+    source: https://runalphaloops.com/fmcsa-api/docs
+    note: 'Verbatim: "Enterprise API access includes 60 requests per minute and 5,000 requests per day. Need more? Additional credits are available for purchase."'
+  - id: mcp-free
+    surface: MCP
+    scope: per-key
+    window: 1 month
+    limit: 1000
+    tier: Free ($0)
+    keys: single API key
+    source: https://runalphaloops.com/mcp
+  - id: mcp-pro
+    surface: MCP
+    scope: per-account
+    window: 1 month
+    limit: 100000
+    tier: Pro (from $499/mo)
+    keys: multiple API keys
+    includes: [webhooks, SLA]
+    uptime_sla: 99.9%
+    source: https://runalphaloops.com/mcp
+  - id: mcp-enterprise
+    surface: MCP
+    scope: per-account
+    window: 1 month
+    limit: unlimited
+    tier: Enterprise (custom)
+    source: https://runalphaloops.com/mcp
+
+per_endpoint_limits: none published
+
+# A REAL, RECONCILABLE-ONLY-BY-THE-PROVIDER CONTRADICTION. Three public pages describe three
+# different commercial gates on the same underlying data, and a developer cannot tell from the
+# outside which one governs.
+contradictions:
+  - id: api-access-tier
+    detail: >-
+      The API reference and the OpenAPI description both state API access is "available exclusively
+      on the Enterprise plan" (Enterprise is $4,000/month on the pricing page, where "API Access" is
+      an Enterprise-only bullet). The MCP page simultaneously advertises a FREE tier with 1,000
+      requests/month and a Pro tier "from $499/mo" with 100K requests/month, and its call to action
+      is "Get an API key" with "Free tier available."
+    sources:
+      - {url: 'https://runalphaloops.com/fmcsa-api/docs', claim: 'API access is available exclusively on our Enterprise plan'}
+      - {url: 'https://runalphaloops.com/pricing', claim: 'API Access listed only under Enterprise, $4,000/month billed annually'}
+      - {url: 'https://runalphaloops.com/mcp', claim: 'Free $0 — 1,000 requests per month. Pro FROM $499/MO — 100K requests per month.'}
+      - {url: 'https://runalphaloops.com/openapi.json', claim: 'API access is available exclusively on the Enterprise plan. Contact sales...'}
+    unresolved: true
+    note: >-
+      Both surfaces authenticate with the same AlphaLoops API key (al_ prefix), so this is unlikely
+      to be two separate products. Most plausible reading is that the MCP page reflects a newer
+      self-serve ladder the REST docs and pricing page have not caught up with — but that is
+      inference, and it is not recorded as fact.
+  - id: window-units-differ
+    detail: >-
+      REST limits are published per-minute and per-day; MCP limits are published per-month. No page
+      states a per-minute ceiling for MCP or a monthly ceiling for REST, so the two ladders cannot
+      be compared without contacting sales.
+
+overage:
+  rest: 'Additional credits available for purchase (mechanism and price not published)'
+  enrichment_credits: 'Add-on ladder published on the pricing page: 1,000/mo $500 · 2,000/mo $900 · 4,000/mo $1,500 · 8,000/mo $2,400'
+
+evidence:
+  - url: https://runalphaloops.com/fmcsa-api/docs
+    http_status: 200
+  - url: https://runalphaloops.com/mcp
+    http_status: 200
+  - url: https://runalphaloops.com/pricing
+    http_status: 200
+  - url: https://runalphaloops.com/openapi.json
+    http_status: 200

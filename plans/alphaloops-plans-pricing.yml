@@ -1,0 +1,196 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/pricing
+description: >-
+  Published plans for AlphaLoops. The main pricing page lists three self-serve platform tiers with
+  named prices plus two add-on ladders. A SECOND, DIFFERENT ladder for API/MCP access is published
+  on the MCP reference page. Both are recorded; the conflict between them is recorded too, because
+  a buyer reading either page alone would reach a different conclusion about what API access costs.
+
+plan_count: 6
+currency: USD
+billing_periods: [monthly, annual]
+annual_discount: 20%
+prices_shown_as: annual billing (the page's default toggle; monthly prices are behind the toggle and were not captured)
+self_serve: partial
+trial:
+  available: true
+  length: 14 days
+  applies_to: [Basic, Pro]
+  note: Enterprise shows "Talk to Sales" rather than a trial.
+
+# --- Ladder 1: the platform pricing page ---
+plans:
+  - name: Basic
+    price: 1200
+    currency: USD
+    period: month
+    billed: annually
+    tagline: Essential features to get started with fleet intelligence.
+    cta: [Get started, Start 14-day trial]
+    api_access: false
+    included:
+      - Carrier Data
+      - CSV Export
+      - Saved Lists
+      - Inspection Data
+      - Truck Data
+      - Trailer Data
+      - Crash Data
+      - Related Companies
+    source: https://runalphaloops.com/pricing
+
+  - name: Pro
+    price: 2520
+    currency: USD
+    period: month
+    billed: annually
+    tagline: Comprehensive data access and integrations for growing teams.
+    badge: MOST POPULAR
+    cta: [Buy now, Start 14-day trial]
+    api_access: false
+    included_additional:
+      - Telematics Data
+      - Fuel Card Data
+      - TMS and Fleet Management Data
+      - Contact Data
+      - Carrier Relationships
+      - Risk Signals
+      - AI-Powered Account Ranking
+      - Hubspot Integration
+      - Salesforce Integration
+    source: https://runalphaloops.com/pricing
+
+  - name: Enterprise
+    price: 4000
+    currency: USD
+    period: month
+    billed: annually
+    tagline: Advanced access and customization for enterprise needs.
+    cta: [Buy now, Talk to Sales]
+    api_access: true
+    included_additional:
+      - Webhooks
+      - API Access
+      - Bulk Data Access
+    quota:
+      requests_per_minute: 60
+      requests_per_day: 5000
+      source: https://runalphaloops.com/fmcsa-api/docs
+    overage: 'Additional credits available for purchase (mechanism and price not published)'
+    source: https://runalphaloops.com/pricing
+    note: >-
+      The only tier on this page carrying API access. The API reference and the OpenAPI description
+      both confirm it: "API access is available exclusively on the Enterprise plan."
+
+# --- Ladder 2: the MCP reference page, published simultaneously ---
+  - name: MCP Free
+    price: 0
+    currency: USD
+    period: month
+    surface: MCP
+    tagline: Evaluation tier
+    quota:
+      requests_per_month: 1000
+    keys: single API key
+    intent: evaluation and small-scale agent prototypes
+    source: https://runalphaloops.com/mcp
+
+  - name: MCP Pro
+    price: 499
+    price_qualifier: from
+    currency: USD
+    period: month
+    surface: MCP
+    tagline: Production tier
+    badge: Recommended
+    quota:
+      requests_per_month: 100000
+    keys: multiple API keys
+    included:
+      - Webhooks
+      - SLA
+    uptime_sla: 99.9%
+    intent: production agent workflows and embedded vendor use
+    source: https://runalphaloops.com/mcp
+
+  - name: MCP Enterprise
+    price: null
+    price_model: custom
+    currency: USD
+    period: month
+    surface: MCP
+    tagline: Embedded vendor
+    quota:
+      requests_per_month: unlimited
+    included:
+      - Multi-tenant key management
+      - Volume pricing
+      - Custom data agreements
+    intent: embedded vendor / OEM
+    cta: Talk to sales
+    source: https://runalphaloops.com/mcp
+
+add_ons:
+  - name: Contact Data (Premium Quality)
+    unit: enrichment credits
+    description: >-
+      Credits to pull and enrich contacts. Consumed by the /v1/contacts/{contact_id}/enrich
+      operation at 1 credit per NEW enrichment; cached results are free.
+    compliance_claim: GDPR and CCPA compliant
+    tiers:
+      - {credits_per_month: 1000, price: 500, currency: USD, period: month}
+      - {credits_per_month: 2000, price: 900, currency: USD, period: month}
+      - {credits_per_month: 4000, price: 1500, currency: USD, period: month}
+      - {credits_per_month: 8000, price: 2400, currency: USD, period: month}
+    unit_economics: '$0.50 → $0.30 per credit as volume rises'
+    source: https://runalphaloops.com/pricing
+
+  - name: Custom Knowledge
+    description: AI agents survey and collect specialized information tailored to the buyer's needs.
+    price: 5000
+    currency: USD
+    unit: 1,000 data points
+    includes:
+      - AI-powered data collection and analysis
+      - Custom survey design and deployment
+      - Structured data delivery in preferred format
+      - Ongoing support and updates
+    cta: Contact Sales
+    source: https://runalphaloops.com/pricing
+
+# The buyer-facing consequence of the two ladders.
+contradictions:
+  - id: api-access-price
+    detail: >-
+      Reading the pricing page, API access costs $4,000/month (Enterprise-only). Reading the MCP
+      page, API access starts free and production use is "from $499/mo". Both pages were live and
+      served 200 on 2026-08-11. The same al_-prefixed Bearer key authenticates both surfaces, so
+      these are almost certainly one product described by two ladders that have not been reconciled.
+    sources:
+      - https://runalphaloops.com/pricing
+      - https://runalphaloops.com/mcp
+      - https://runalphaloops.com/fmcsa-api/docs
+    unresolved: true
+  - id: webhooks-tier
+    detail: >-
+      Webhooks are an Enterprise-only bullet on the pricing page but a Pro-tier inclusion on the
+      MCP page. Neither page links to any webhook documentation, and no webhook catalog, event
+      list, or AsyncAPI is published anywhere on the site — see the note in
+      lifecycle/alphaloops-lifecycle.yml.
+
+key_issuance:
+  self_service: false
+  process: Contact sales at https://runalphaloops.com/contact to get an API key
+  source: https://runalphaloops.com/openapi.json
+  note: >-
+    The MCP page's "Get an API key" call to action links to the same /contact form, so even the
+    advertised free MCP tier is sales-gated in practice.
+
+evidence:
+  - url: https://runalphaloops.com/pricing
+    http_status: 200
+  - url: https://runalphaloops.com/mcp
+    http_status: 200
+  - url: https://runalphaloops.com/fmcsa-api/docs
+    http_status: 200

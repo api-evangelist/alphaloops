@@ -1,0 +1,255 @@
+generated: '2026-08-11'
+method: derived
+source: >-
+  Derived from openapi/alphaloops-fmcsa-carrier-data-api-openapi.json, the published API reference
+  at https://runalphaloops.com/fmcsa-api/docs, the MCP reference at https://runalphaloops.com/mcp,
+  the security page at https://runalphaloops.com/security, and the live well-known probes recorded
+  in well-known/alphaloops-well-known.yml.
+description: >-
+  Which cross-cutting industry standards and conventions the AlphaLoops surface actually conforms
+  to. Every entry carries evidence; a `false` here means the standard was checked and is genuinely
+  not met, not that it was not looked for.
+
+standards:
+  - id: openapi
+    name: OpenAPI Specification
+    version: 3.1.0
+    conforms: true
+    evidence: >-
+      Live machine-readable spec served at https://runalphaloops.com/openapi.json (HTTP 200,
+      application/json, 80KB). Declares openapi 3.1.0, 24 paths / 25 operations, 53 component
+      schemas, reusable components.parameters and components.responses, a single production server,
+      and a bearerAuth securityScheme. Every operation carries a unique operationId, a summary and
+      a description. Parses cleanly.
+    quality_notes:
+      - Reusable components.responses ($ref'd for 400/401/404/429) keep the error contract uniform.
+      - 'GAP: tags is an empty array and no operation is tagged, so the spec has no navigable grouping.'
+      - 'GAP: almost no examples — 2 example fields across the whole document, and no examples blocks.'
+      - 'GAP: 500 and 502 are documented in the reference but declared on no operation.'
+
+  - id: json-schema
+    name: JSON Schema
+    version: 2020-12
+    conforms: true
+    evidence: >-
+      Implied by OpenAPI 3.1.0, which aligns its Schema Object with JSON Schema 2020-12.
+      53 component schemas with $ref composition throughout.
+
+  - id: rfc9457
+    name: RFC 9457 Problem Details for HTTP APIs
+    conforms: false
+    evidence: >-
+      Errors use a proprietary two-field envelope {"error","message"} served as application/json.
+      No application/problem+json media type, no type URI, no title/detail/instance members.
+      See errors/alphaloops-problem-types.yml.
+
+  - id: rfc9116
+    name: RFC 9116 security.txt
+    conforms: false
+    evidence: >-
+      Probed on all three hosts. runalphaloops.com returns the SPA shell (200 HTML, not a
+      document); api.runalphaloops.com and mcp-freight.runalphaloops.com both return 404. A
+      disclosure address and 24-hour response commitment ARE published in prose at /security, so
+      the program exists but the machine-readable form does not.
+
+  - id: rfc8414
+    name: RFC 8414 OAuth 2.0 Authorization Server Metadata
+    conforms: true
+    partial: true
+    evidence: >-
+      https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server returns HTTP 200
+      with a valid metadata document (issuer, authorization_endpoint, token_endpoint,
+      registration_endpoint, response_types_supported, grant_types_supported,
+      token_endpoint_auth_methods_supported, code_challenge_methods_supported).
+      Served on the MCP host only — not on the REST API host.
+    gap: No scopes_supported member, so no scope vocabulary is discoverable.
+
+  - id: rfc9728
+    name: RFC 9728 OAuth 2.0 Protected Resource Metadata
+    conforms: false
+    evidence: >-
+      /.well-known/oauth-protected-resource returns 404 on the MCP host and on the API host.
+      The 401 from /mcp does carry a WWW-Authenticate header with an authorization_uri parameter,
+      so discovery is possible via that hint rather than the standard document.
+
+  - id: rfc7636
+    name: RFC 7636 PKCE
+    conforms: true
+    evidence: 'code_challenge_methods_supported: ["S256"] in the authorization server metadata.'
+
+  - id: rfc7591
+    name: RFC 7591 OAuth 2.0 Dynamic Client Registration
+    conforms: true
+    evidence: >-
+      registration_endpoint https://mcp-freight.runalphaloops.com/oauth/register advertised in the
+      authorization server metadata, with token_endpoint_auth_methods_supported ["none"]
+      (public client profile).
+
+  - id: oauth2
+    name: OAuth 2.0
+    conforms: true
+    partial: true
+    evidence: >-
+      Authorization-code + refresh-token grants on the MCP host per RFC 8414 metadata. NOT used by
+      the REST API, which authenticates with a static Bearer API key and declares only an
+      http/bearer securityScheme. Two different auth models across the two surfaces, and the
+      documentation only covers the static key.
+
+  - id: oidc
+    name: OpenID Connect
+    conforms: false
+    evidence: /.well-known/openid-configuration returns 404 (API + MCP hosts) and the SPA shell on the website host.
+
+  - id: mcp
+    name: Model Context Protocol
+    conforms: true
+    evidence: >-
+      Hosted remote server at https://mcp-freight.runalphaloops.com/mcp using the standard MCP URL
+      transport with HTTPS + SSE (streamable HTTP for SDK clients). tools/list responds to
+      JSON-RPC 2.0 with a well-formed 401 + WWW-Authenticate challenge when unauthenticated.
+      Provider documents Claude Desktop/Code, Cursor, Windsurf, VS Code Copilot and Clay as clients.
+    gap: Live tool schemas are auth-gated; no publicly readable inputSchema for any tool.
+
+  - id: a2a
+    name: A2A Agent Card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and the legacy /.well-known/agent.json probed on all three
+      hosts: 404 on api. and mcp-freight., SPA shell (200 HTML, not an AgentCard) on
+      runalphaloops.com. No agent card is served. No a2a/ artifact written.
+
+  - id: asyncapi
+    name: AsyncAPI
+    conforms: false
+    evidence: >-
+      No AsyncAPI document published and no webhook documentation of any kind, despite webhooks
+      being sold as a plan inclusion on both the pricing page and the MCP page.
+      See lifecycle/alphaloops-lifecycle.yml.
+
+  - id: llmstxt
+    name: llms.txt
+    conforms: false
+    evidence: >-
+      https://runalphaloops.com/llms.txt returns HTTP 200 but with the 6,831-byte SPA HTML shell —
+      byte-identical to the response for /apis.json and every /.well-known/ path. Not an llms.txt.
+      A generated one is provided at llms/alphaloops-llms.txt.
+
+  - id: apisjson
+    name: APIs.json
+    conforms: false
+    evidence: https://runalphaloops.com/apis.json returns the SPA HTML shell, not JSON.
+
+  - id: rfc9727
+    name: RFC 9727 api-catalog
+    conforms: false
+    evidence: /.well-known/api-catalog — 404 on API and MCP hosts, SPA shell on the website host.
+
+  - id: rfc8594
+    name: RFC 8594 Sunset HTTP Header
+    conforms: false
+    evidence: >-
+      No Sunset or Deprecation headers. A 90-day deprecation window IS published in prose for MCP
+      tool schemas, but it is not signalled at runtime and does not cover the REST surface.
+
+  - id: ratelimit-headers
+    name: RateLimit header fields (draft-ietf-httpapi-ratelimit-headers)
+    conforms: false
+    partial: true
+    evidence: >-
+      Rate limits ARE signalled on every response, but using custom X-RateLimit-* and X-DailyLimit-*
+      headers rather than the standard RateLimit-Limit/Remaining/Reset form. Retry-After (RFC 9110)
+      IS standard and is declared on the 429 response in the OpenAPI.
+
+  - id: idempotency
+    name: Idempotency-Key (draft-ietf-httpapi-idempotency-key-header)
+    conforms: false
+    evidence: >-
+      No idempotency key on either surface. Defensible for REST, which is read-only (23 of 25
+      operations are GET and both POSTs are searches), but the MCP surface mutates state
+      (list_create, watchlist_subscribe) and enrichContact is credit-metered.
+      See conventions/alphaloops-conventions.yml.
+
+  - id: cors
+    name: CORS (Fetch/W3C)
+    conforms: true
+    evidence: >-
+      Documented verbatim: "All endpoints support CORS preflight (OPTIONS -> 204) with
+      Access-Control-Allow-Origin: *."
+    caution: >-
+      Wildcard origin combined with a static, unscoped Bearer key means browser use exposes the
+      credential to every page visitor. Documented as "safe to call directly from browser-based
+      applications", which is true of CORS and misleading about key custody.
+
+  - id: tls
+    name: TLS 1.3
+    conforms: true
+    evidence: 'Probed: TLSv1.3 on runalphaloops.com and api.runalphaloops.com. Security page claims TLS 1.3 in transit, AES-256 at rest.'
+
+  - id: hsts
+    name: HTTP Strict Transport Security
+    conforms: false
+    partial: true
+    evidence: >-
+      Not present on runalphaloops.com. The MCP host DOES return
+      strict-transport-security: max-age=63072000. Inconsistent across hosts.
+      See security/alphaloops-domain-security.yml.
+
+  - id: dnssec
+    name: DNSSEC
+    conforms: false
+    evidence: No DNSKEY on runalphaloops.com.
+
+  - id: caa
+    name: DNS CAA
+    conforms: false
+    evidence: No CAA records on runalphaloops.com.
+
+  - id: spf
+    name: SPF
+    conforms: false
+    evidence: No SPF record found on runalphaloops.com.
+
+  - id: dmarc
+    name: DMARC
+    conforms: true
+    partial: true
+    evidence: 'DMARC record present with policy p=none — monitoring only, no enforcement.'
+
+# Sector-specific regimes checked and found not applicable or not claimed.
+sector_regimes:
+  - id: fmcsa-safer
+    name: FMCSA / SAFER data domain
+    applicable: true
+    conforms: n/a
+    note: >-
+      AlphaLoops republishes and enriches FMCSA motor-carrier data (DOT/MC identifiers, authority
+      status, safety ratings, CSA BASICs, inspections, crashes, insurance filings). FMCSA publishes
+      data, not an API conformance profile, so there is no standard to conform TO — but the domain
+      vocabulary (USDOT number, MC/MX docket, BMC-91, BASIC categories, OOS) is used faithfully.
+  - id: soc2
+    name: SOC 2
+    conforms: unverified
+    note: Claimed as infrastructure posture, not as a held certification. See security/alphaloops-trust-center.yml.
+  - id: iso27001
+    name: ISO/IEC 27001
+    conforms: unverified
+    note: Claimed as "aligned controls", not as a held certification.
+  - id: gdpr
+    name: GDPR
+    conforms: claimed
+    evidence: '"GDPR and CCPA compliant" stated against the contact-data add-on on the pricing page.'
+  - id: ccpa
+    name: CCPA
+    conforms: claimed
+    evidence: Same pricing-page statement.
+
+summary:
+  conformant: 9
+  non_conformant: 13
+  claimed_unverified: 4
+  headline: >-
+    Strong on the contract itself — a real, current, well-structured OpenAPI 3.1 with reusable
+    error responses, plus a genuinely standards-shaped MCP + OAuth 2.0 authorization surface.
+    Weak on the discovery and governance layer — no security.txt, no api-catalog, no agent card,
+    no protected-resource metadata, no problem+json, no Sunset headers, and an llms.txt and
+    apis.json that are advertised but resolve to the marketing SPA.

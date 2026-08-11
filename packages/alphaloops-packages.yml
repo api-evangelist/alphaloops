@@ -1,0 +1,137 @@
+generated: '2026-08-11'
+method: searched
+source: https://github.com/RunAlphaLoop/freight-sdk
+description: >-
+  First-party AlphaLoops client libraries, CLI and workflow node. All four packages were resolved
+  against their registry metadata endpoints (registry.npmjs.org, pypi.org/pypi/<pkg>/json) on
+  2026-08-11 and every version/published pair below is read from that metadata, not from prose.
+  All are published from the RunAlphaLoop GitHub organization, which makes them clearly first-party.
+  Announced 2026-03-11 in the provider changelog ("AlphaLoops Developer SDKs and CLI — Now Available").
+
+# CURRENCY READ — the whole first-party client surface has gone quiet. Newest release across all
+# four packages is 2026-04-29 (the n8n node); the SDKs last shipped 2026-04-19 and the CLI has not
+# been released since 2026-03-11, five months before this pass. Meanwhile the REST API is still
+# advertising and shipping surface the SDKs do not cover: the live OpenAPI carries 25 operations,
+# but the published SDK resource modules cover only carriers, contacts, crashes, fleet and
+# inspections — insurance, timeline, mc-sales, equipment-for-sale, connections, risk-signals,
+# similar, overview and the VIN endpoints have no SDK resource at all. The CLI's own AGENTS.md
+# documents the same five command groups. The SDKs are a partial, aging projection of the API.
+currency:
+  newest_release_across_packages: '2026-04-29'
+  sdk_last_release: '2026-04-19'
+  cli_last_release: '2026-03-11'
+  api_operations_in_openapi: 25
+  sdk_resource_modules: 5
+  uncovered_operation_families:
+    - insurance
+    - timeline
+    - mc-sales
+    - equipment-for-sale
+    - connections
+    - risk-signals
+    - similar
+    - overview
+    - vins
+
+packages:
+  - language: python
+    registry: pypi
+    name: alphaloops-freight-sdk
+    url: https://pypi.org/project/alphaloops-freight-sdk/
+    source: https://github.com/RunAlphaLoop/freight-sdk
+    install: pip install alphaloops-freight-sdk
+    official: true
+    version: 0.2.2
+    published: '2026-04-19'
+    first_published: '2026-03-10'
+    release_count: 5
+    requires_python: '>=3.9'
+    license: MIT
+    registry_metadata: https://pypi.org/pypi/alphaloops-freight-sdk/json
+    registry_http_status: 200
+    note: >-
+      Sync + async clients. Resource modules: carriers, contacts, crashes, fleet, inspections.
+      Pre-1.0 (0.2.2) against an API whose OpenAPI declares info.version 1.0.0.
+
+  - language: typescript
+    registry: npm
+    name: alphaloops-freight-sdk
+    url: https://www.npmjs.com/package/alphaloops-freight-sdk
+    source: https://github.com/RunAlphaLoop/freight-sdk
+    install: npm install alphaloops-freight-sdk
+    official: true
+    version: 0.2.2
+    published: '2026-04-19'
+    first_published: '2026-03-10'
+    release_count: 7
+    license: MIT
+    registry_metadata: https://registry.npmjs.org/alphaloops-freight-sdk
+    registry_http_status: 200
+    note: >-
+      TypeScript client, same repo (directory "typescript"). Mirrors the Python resource set;
+      no async/streaming variant. Pre-1.0.
+
+  - language: python
+    registry: pypi
+    name: alphaloops-freight-cli
+    url: https://pypi.org/project/alphaloops-freight-cli/
+    source: https://github.com/RunAlphaLoop/freight-cli
+    install: pip install alphaloops-freight-cli
+    official: true
+    version: 0.4.0
+    published: '2026-03-11'
+    first_published: '2026-03-10'
+    release_count: 4
+    requires_python: '>=3.9'
+    license: MIT
+    binary: loopsh
+    registry_metadata: https://pypi.org/pypi/alphaloops-freight-cli/json
+    registry_http_status: 200
+    note: >-
+      The `loopsh` CLI. Oldest package in the set — four releases in two days in March 2026 and
+      nothing since. Ships a provider-authored agent guide at alphaloops/AGENTS.md.
+      See cli/alphaloops-cli.yml.
+
+  - language: typescript
+    registry: npm
+    name: n8n-nodes-alphaloops-freight
+    url: https://www.npmjs.com/package/n8n-nodes-alphaloops-freight
+    source: https://github.com/RunAlphaLoop/n8n-nodes-alphaloops-freight
+    install: npm install n8n-nodes-alphaloops-freight
+    official: true
+    version: 0.1.18
+    published: '2026-04-29'
+    first_published: '2026-03-01'
+    release_count: 17
+    license: MIT
+    registry_metadata: https://registry.npmjs.org/n8n-nodes-alphaloops-freight
+    registry_http_status: 200
+    kind: workflow-node
+    note: >-
+      Verified n8n community node. Vendors a copy of the TypeScript SDK under nodes/AlphaLoops/sdk/
+      kept in step by scripts/sync-sdk.sh rather than depending on the published package.
+
+# Registries checked with no first-party AlphaLoops package present.
+absent:
+  - registry: npm
+    name: '@alphaloops/freight-sdk'
+    http_status: 404
+    note: Scoped variant not published; the unscoped name is the real one.
+  - registry: npm
+    name: alphaloops
+    http_status: 404
+  - registry: pypi
+    name: alphaloops
+    http_status: 404
+  - registry: maven
+    note: No Java client published.
+  - registry: nuget
+    note: No .NET client published.
+  - registry: rubygems
+    note: No Ruby client published.
+  - registry: packagist
+    note: No PHP client published.
+  - registry: crates.io
+    note: No Rust client published.
+  - registry: pkg.go.dev
+    note: No Go client published.

@@ -1,0 +1,308 @@
+generated: '2026-08-11'
+method: derived
+source: openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
+description: >-
+  Entity-relationship graph for the AlphaLoops FMCSA Carrier Data API, derived from the $ref graph
+  and the id-reference fields across the 53 component schemas in the live OpenAPI 3.1.
+
+# The domain has ONE root. Every read path begins at a Carrier identified by its USDOT number, and
+# 19 of 25 operations take dot_number (or mc_number, which resolves to it) as a path parameter.
+# There is no cross-carrier entity, no account/user/tenant object, and nothing writable — the model
+# is a read-only star with Carrier at the centre and one secondary hub (VIN) that can be entered
+# independently.
+root_entity: Carrier
+primary_key: dot_number
+alternate_keys: [mc_number]
+secondary_entry_point: VIN
+writable_entities: none
+
+identifiers:
+  - field: dot_number
+    entity: Carrier
+    type: string
+    description: USDOT number — the primary carrier identifier and the join key for almost every response.
+    prefix: none
+  - field: mc_number
+    entity: Carrier
+    type: string
+    description: Motor Carrier / MX docket number — secondary identifier.
+    format_note: >-
+      Appears both bare ("183261") and prefixed ("MC-728261") in the provider's own documented
+      response examples. No canonical form is stated.
+  - field: vin
+    entity: Truck / Trailer / EquipmentForSaleItem
+    type: string
+    description: 17-character Vehicle Identification Number; the join key for the equipment sub-domain.
+  - field: inspection_id
+    entity: Inspection
+    type: string
+    example_form: INS-12345
+  - field: crash_id
+    entity: Crash
+    example_form: CRA-98765
+  - field: id
+    entity: Contact / EnrichedContact
+    example_form: HDTokLjK7VouzDxs5htfBQ_0000
+    note: Opaque; the only identifier that is not a public-registry key.
+  - field: docket_number
+    entity: AuthorityRecord / InsurancePolicy
+  - field: policy_number
+    entity: InsurancePolicy
+
+entities:
+  - name: Carrier
+    schema: CarrierProfile
+    description: 200+-field motor carrier profile — identity, authority, safety, fleet, technology, growth, officers.
+    key: dot_number
+    operations: [getCarrierByDot, getCarrierByMc, getCarrierOverview]
+    relationships:
+      - {type: has_one, target: Address, via: physical_address}
+      - {type: has_one, target: FleetComposition, via: fleet_composition}
+      - {type: has_one, target: GrowthMetrics, via: growth}
+      - {type: has_one, target: TechnologyStack, via: technology}
+      - {type: has_many, target: CompanyOfficer, via: company_officers}
+      - {type: has_many, target: AuthorityRecord, via: 'GET /v1/carriers/{dot_number}/authority'}
+      - {type: has_many, target: InsurancePolicy, via: 'GET /v1/carriers/{dot_number}/insurance'}
+      - {type: has_many, target: Truck, via: 'GET /v1/carriers/{dot_number}/trucks'}
+      - {type: has_many, target: Trailer, via: 'GET /v1/carriers/{dot_number}/trailers'}
+      - {type: has_many, target: Inspection, via: 'GET /v1/carriers/{dot_number}/inspections'}
+      - {type: has_many, target: Crash, via: 'GET /v1/carriers/{dot_number}/crashes'}
+      - {type: has_many, target: NewsArticle, via: 'GET /v1/carriers/{dot_number}/news'}
+      - {type: has_many, target: Contact, via: 'GET /v1/contacts/search?dot='}
+      - {type: has_many, target: TimelineEvent, via: 'GET /v1/carriers/{dot_number}/timeline'}
+      - {type: has_many, target: EquipmentForSaleItem, via: 'GET /v1/carriers/{dot_number}/equipment-for-sale'}
+      - {type: has_one, target: McSaleListing, via: 'GET /v1/carriers/{dot_number}/mc-sales'}
+      - {type: has_one, target: RiskSignalsResponse, via: 'GET /v1/carriers/{dot_number}/risk-signals'}
+      - {type: has_many, target: Carrier, via: 'GET /v1/carriers/{dot_number}/connections', kind: graph}
+      - {type: has_many, target: Carrier, via: 'GET /v1/carriers/{dot_number}/similar', kind: similarity}
+
+  - name: Address
+    schema: Address
+    embedded_in: [CarrierProfile]
+    fields: [street, city, state, zip]
+
+  - name: FleetComposition
+    schema: FleetComposition
+    embedded_in: [CarrierProfile]
+
+  - name: GrowthMetrics
+    schema: GrowthMetrics
+    embedded_in: [CarrierProfile]
+    fields: [trucks_added_24m, drivers_added_24m]
+
+  - name: TechnologyStack
+    schema: TechnologyStack
+    embedded_in: [CarrierProfile]
+    fields: [telematics, tms, fuel_card]
+    note: >-
+      The proprietary layer — detected vendor usage across 100+ tracked telematics, TMS, ELD and
+      fuel-card providers. Not FMCSA data.
+
+  - name: CompanyOfficer
+    schema: CompanyOfficer
+    embedded_in: [CarrierProfile]
+    belongs_to: Carrier
+    note: Officers are also nodes in the connection graph — shared officers link carrier entities.
+
+  - name: AuthorityRecord
+    schema: AuthorityRecord
+    belongs_to: Carrier
+    key: docket_number
+    envelope: AuthorityResponse
+    pagination: offset/limit
+    description: Authority grants, revocations and reinstatements.
+
+  - name: InsurancePolicy
+    schema: InsurancePolicy
+    belongs_to: Carrier
+    key: policy_number
+    envelope: InsuranceResponse
+    pagination: page/limit
+    cross_keys: [dot_number, mc_number, docket_number]
+
+  - name: Truck
+    schema: Truck
+    belongs_to: Carrier
+    key: vin
+    envelope: TrucksResponse
+    results_key: trucks
+    pagination: offset/limit
+    fields: [vin, make, model_year, gvw, cab_type]
+
+  - name: Trailer
+    schema: Trailer
+    belongs_to: Carrier
+    key: vin
+    envelope: TrailersResponse
+    results_key: trailers
+    pagination: offset/limit
+    fields: [vin, manufacturer, model_year, type, reefer]
+
+  - name: Inspection
+    schema: Inspection
+    belongs_to: Carrier
+    key: inspection_id
+    envelope: InspectionsResponse
+    results_key: inspections
+    pagination: offset/limit
+    relationships:
+      - {type: has_many, target: Violation, via: 'GET /v1/inspections/{inspection_id}/violations'}
+
+  - name: Violation
+    schema: Violation
+    belongs_to: Inspection
+    envelope: ViolationsResponse
+    results_key: violations
+    pagination: page/limit
+    fields: [code, description, basic_category, oos]
+
+  - name: Crash
+    schema: Crash
+    belongs_to: Carrier
+    key: crash_id
+    envelope: CrashesResponse
+    results_key: crashes
+    pagination: page/limit
+    enums:
+      severity: [FATAL, INJURY, TOW, PROPERTY_DAMAGE]
+
+  - name: NewsArticle
+    schema: NewsArticle
+    belongs_to: Carrier
+    envelope: NewsResponse
+    results_key: articles
+
+  - name: Contact
+    schema: Contact
+    belongs_to: Carrier
+    key: id
+    envelope: ContactSearchResponse
+    results_key: contacts
+    pagination: page/limit
+    enums:
+      job_title_levels: [c_suite, vp, director, manager]
+    relationships:
+      - {type: has_one, target: EnrichedContact, via: 'GET /v1/contacts/{contact_id}/enrich', metered: true}
+
+  - name: EnrichedContact
+    schema: EnrichedContact
+    extends: Contact
+    metered: true
+    cost: 1 credit per new enrichment (cached free)
+    adds: [work_email, personal_emails, phone_numbers, mobile_phone, location_name, skills, credits]
+    relationships:
+      - {type: has_many, target: WorkExperience, via: experience}
+      - {type: has_many, target: Education, via: education}
+    pii: true
+    note: >-
+      The only entity in the model carrying personal data about a named individual. Sits in tension
+      with the security page's "Only process DOT numbers - no sensitive personal or financial data".
+
+  - name: TimelineEvent
+    schema: TimelineEvent
+    belongs_to: Carrier
+    envelope: TimelineResponse
+    results_key: events
+    pagination: offset/limit
+    fields: [id, dot_number, detected_at, category, event_type, headline, field_name, old_value, new_value, metadata, source]
+    enums:
+      category: [contact, address, fleet, operations, authority, people]
+    note: >-
+      A change-data-capture feed over the carrier record — the closest thing the API has to an
+      event stream, and the documented substitute for the webhooks that are sold but not specified.
+
+  - name: McSaleListing
+    schema: McSaleListing
+    belongs_to: Carrier
+    envelope: McSalesResponse
+    cardinality: has_one
+    description: Whether the carrier's operating authority is listed for sale — a chameleon-carrier signal.
+
+  - name: EquipmentForSaleItem
+    schema: EquipmentForSaleItem
+    belongs_to: Carrier
+    key: vin
+    envelope: EquipmentForSaleResponse
+    results_key: equipment
+    pagination: page/limit
+    description: Equipment the carrier is listing for sale — a financial-distress signal.
+
+  - name: ConnectionGraph
+    schemas: [ConnectionNode, ConnectionEdge, ConnectionsResponse]
+    belongs_to: Carrier
+    shape: graph
+    results_keys: [nodes, edges]
+    description: >-
+      Corporate-connection graph linking carrier entities by shared VINs, officers, phone numbers
+      and addresses. The only non-tabular response in the API, and the mechanism behind
+      shell-company and chameleon-carrier detection.
+
+  - name: RiskSignals
+    schemas: [RiskSignalsResponse, RiskSignalLevel, RiskTriggeredCombo]
+    belongs_to: Carrier
+    cardinality: has_one
+    description: >-
+      Consolidated risk assessment. Composed of several named RiskSignalLevel members plus
+      RiskTriggeredCombo, which encodes the provider's stated position that risk comes from
+      COMBINATIONS of signals rather than single events.
+
+  - name: SimilarCarrier
+    schema: SimilarCarrier
+    relates: Carrier -> Carrier
+    envelope: SimilarResponse
+    results_key: similar_carriers
+    description: Lookalike ranking powered by the provider's carrier embedding model.
+
+  - name: VinRecord
+    schemas: [VinResult, VinsResponse, VinDotAssociation, VinLocation, VinInspectionResponse]
+    key: vin
+    description: >-
+      The second entry point into the graph. A VIN can be looked up independently
+      (GET/POST /v1/vins) and resolves BACK to carriers via VinDotAssociation — so equipment is
+      many-to-many with carriers over time, which is precisely what exposes a truck moving between
+      a revoked carrier and its successor.
+    relationships:
+      - {type: has_many, target: Carrier, via: dot_numbers, kind: reverse-lookup}
+      - {type: has_many, target: VinLocation, via: locations}
+      - {type: has_many, target: Inspection, via: 'GET /v1/inspections/vin/{vin}'}
+
+shared_envelopes:
+  - name: Pagination
+    schema: Pagination
+    fields: [page, limit, total_results, total_pages]
+    used_by: [CarrierSearchResponse, ViolationsResponse, CrashesResponse, ContactSearchResponse, CarrierQueryResponse, InsuranceResponse, EquipmentForSaleResponse]
+    note: >-
+      Only the page/limit endpoints share this component. The offset/limit endpoints inline
+      total/limit/offset at the top level instead — two envelope shapes, no shared abstraction.
+  - name: Error
+    schema: Error
+    fields: [error, message]
+    used_by: all error responses
+
+modelling_observations:
+  - id: results-key-inconsistency
+    detail: >-
+      The collection array is named differently in nearly every envelope — trucks, trailers,
+      inspections, violations, crashes, articles, contacts, events, equipment, similar_carriers,
+      insurance, results. A generic client cannot locate the payload without per-endpoint
+      knowledge. A single `results` key (already used by CarrierSearchResponse and VinsResponse)
+      would make the whole API traversable generically.
+  - id: two-pagination-shapes
+    detail: Page/limit with a Pagination component vs offset/limit inlined. See conventions/.
+  - id: no-hypermedia
+    detail: >-
+      No links, no self references, no _links. Relationships are entirely implicit in URL
+      templates — a client must know that dot_number substitutes into nine sub-resource paths.
+  - id: read-only
+    detail: >-
+      No create/update/delete anywhere. The list, watchlist and scoring surfaces that DO write
+      state exist only as MCP tools with no REST equivalent — see mcp/alphaloops-tool-crosswalk.yml.
+  - id: mc-number-format-drift
+    detail: mc_number appears bare and MC-prefixed in the provider's own documented examples.
+
+counts:
+  schemas: 53
+  entities: 22
+  operations: 25
+  operations_keyed_by_dot_number: 19
+  operations_keyed_by_vin: 3

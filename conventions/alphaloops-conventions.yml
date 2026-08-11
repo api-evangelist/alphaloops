@@ -1,0 +1,206 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/fmcsa-api/docs
+description: >-
+  Cross-cutting runtime semantics for the AlphaLoops FMCSA Carrier Data API, read from the
+  provider's "General Notes" documentation section and corroborated against the live OpenAPI 3.1
+  and the provider-published CLI agent guide (alphaloops/AGENTS.md in RunAlphaLoop/freight-cli).
+
+authentication:
+  style: bearer-token
+  header: 'Authorization: Bearer YOUR_API_KEY'
+  key_prefix: al_
+  key_prefix_source: 'MCP 401 response body ("Pass your AlphaLoops API key as: Authorization: Bearer al_...")'
+  key_prefix_conflict: >-
+    The CLI README and the provider-published AGENTS.md both document the prefix as `ak_`, while
+    the live MCP 401 says `al_`. Two documented prefixes for the same credential; one is stale.
+  oauth2: false
+  scopes: false
+  key_issuance: sales-issued, not self-service
+  environments: single — no separate test/live key namespace is published
+  cross_ref: authentication/alphaloops-authentication.yml
+
+# IDEMPOTENCY — recorded as ABSENT, deliberately, because the absence is defensible here.
+idempotency:
+  supported: false
+  header: null
+  scope: null
+  retention: null
+  note: >-
+    No idempotency key is documented and none appears in the OpenAPI. The REST surface is
+    effectively read-only: 23 of 25 operations are GET, and the two POSTs (POST /v1/carriers/query
+    and POST /v1/vins) are search/lookup operations that use a request body only because the filter
+    payload is too large for a query string — neither creates or mutates a resource. Idempotency
+    keys would add nothing to this contract as published.
+  caveat: >-
+    The MCP surface DOES mutate state (list_create, watchlist_subscribe, list_enrich) and
+    enrichContact consumes a metered credit. A retried enrichment or a retried subscribe has real
+    cost and real duplication risk, and neither surface documents replay protection. This is the
+    one place the provider should add it.
+
+pagination:
+  consistent: false
+  styles:
+    - style: page-limit
+      params: [page, limit]
+      defaults: {page: 1, limit: 50}
+      note: 'Search endpoints: limit default 10, max 50 on GET /v1/carriers/search; default 25 on POST /v1/carriers/query.'
+      applies_to:
+        - searchCarriers
+        - queryCarriers
+        - getCarrierCrashes
+        - getCarrierNews
+        - searchContacts
+    - style: offset-limit
+      params: [offset, limit]
+      defaults: {offset: 0, limit: 50}
+      applies_to:
+        - getCarrierTrucks
+        - getCarrierTrailers
+        - getCarrierInspections
+        - getCarrierAuthority
+        - getCarrierTimeline
+  response_envelope:
+    page_limit: 'pagination: {page, limit, total_results, total_pages}'
+    offset_limit: 'top-level total / limit / offset alongside the results array'
+  results_key_varies: true
+  results_keys: [results, contacts, events]
+  provider_warning: >-
+    Verbatim from the docs: "Most endpoints use page / limit pagination. However, trucks,
+    trailers, inspections, and authority use offset / limit instead. Check each endpoint's
+    parameter table for the correct style."
+  assessment: >-
+    Two pagination styles and three result-array keys in one 25-operation API. The provider
+    documents the split honestly rather than hiding it, but it is a real integration tax and the
+    single highest-value consistency fix available to them.
+
+field_expansion:
+  supported: true
+  param: fields
+  form: comma-separated string on GET, string[] array on POST /v1/carriers/query
+  scope_limited: true
+  note: >-
+    Verbatim: "The ?fields= parameter is only available on the carrier profile endpoints
+    (/v1/carriers/{dot_number} and /v1/carriers/mc/{mc_number}). It is not supported on other
+    endpoints." POST /v1/carriers/query takes its own `fields` array in the request body.
+    Rationale given is cost/latency — the full carrier profile is 200+ fields.
+
+sorting:
+  supported_on: [queryCarriers]
+  params: [sort_by, sort_order]
+  sort_fields: [power_units, drivers, date_added, safety_rating, annual_revenue, distance]
+  default_order: desc
+
+filtering:
+  advanced_on: queryCarriers
+  form: include/exclude objects
+  capabilities:
+    - 'scalar equality — e.g. state, operating_authority_status'
+    - 'range objects — e.g. power_units: {min: 50}'
+    - 'array membership — e.g. cargo_type: [Van, Reefer]'
+    - 'geo-radius — e.g. location: {latitude, longitude, radius_miles}'
+
+error_envelope:
+  format: proprietary-json
+  rfc9457: false
+  content_type: application/json
+  shape: '{"error": "Short error type", "message": "Human-readable description of what went wrong."}'
+  schema: '#/components/schemas/Error'
+  required: [error, message]
+  stable_error_codes: false
+  note: >-
+    Consistent two-field envelope across every failure, declared in the OpenAPI as a reusable
+    component and reused via $ref on all four shared responses. Not RFC 9457 problem+json — no
+    type URI, no instance, no per-problem registry. The `error` field is described as a "short
+    error type" but no enumeration of its values is published, so a client cannot branch on it
+    reliably. Cross-ref errors/alphaloops-problem-types.yml.
+
+rate_limiting:
+  signalled: true
+  headers_documented: true
+  request_headers: []
+  response_headers:
+    - X-RateLimit-Limit
+    - X-RateLimit-Remaining
+    - X-RateLimit-Reset
+    - X-DailyLimit-Limit
+    - X-DailyLimit-Remaining
+    - X-DailyLimit-Reset
+    - Retry-After
+  exhausted_status: 429
+  note: >-
+    Two independent windows (per-minute and per-day) each with their own limit/remaining/reset
+    triple, returned on EVERY response, not only on 429. Retry-After is declared on the 429
+    response in the OpenAPI. This is a genuinely good runtime signal.
+  cross_ref: rate-limits/alphaloops-rate-limits.yml
+
+metering:
+  credit_metered_operations: [enrichContact]
+  unit: enrichment credit
+  cost: 1 credit per NEW enrichment; cached results free
+  balance_header: X-Enrichment-Credits-Remaining
+  balance_body_field: credits {used, remaining, total}
+  exhausted_status: 402
+  note: >-
+    A metered operation that reports its own balance both in-band (header) and in the payload.
+    Worth calling out — most metered APIs make you query a separate billing endpoint.
+
+async_semantics:
+  present: true
+  operations: [searchContacts]
+  status: 202
+  behaviour: 'Accepted — contacts are being fetched asynchronously, retry after delay'
+  callback_or_poll: poll
+  note: >-
+    No Location header, no job id, no documented poll interval is published — the client is told
+    only to "retry after delay". This is the weakest-specified part of the contract.
+
+versioning:
+  rest:
+    style: uri-path
+    current: v1
+    prefix: /v1/
+    spec_info_version: 1.0.0
+  mcp:
+    style: header-pinned
+    header: X-AlphaLoops-Version
+    default: latest when omitted
+  note: >-
+    The two surfaces version DIFFERENTLY — path-versioned REST, header-pinned MCP — and only the
+    MCP surface publishes a deprecation window (90 days).
+  cross_ref: lifecycle/alphaloops-lifecycle.yml
+
+cors:
+  supported: true
+  preflight: 'OPTIONS -> 204'
+  allow_origin: '*'
+  verbatim: >-
+    "All endpoints support CORS preflight (OPTIONS -> 204) with Access-Control-Allow-Origin: *.
+    Safe to call directly from browser-based applications."
+  assessment: >-
+    Documented as browser-safe, but the only credential the API accepts is a static Bearer key
+    with no scoping and no per-origin restriction. Calling it from a browser exposes that key to
+    every user of the page. The advice is technically true about CORS and risky about key custody.
+
+request_tracing:
+  request_id_header: null
+  documented: false
+  note: No correlation/request-id header is documented on either surface.
+
+http_semantics:
+  methods_allowed: [GET, POST, OPTIONS]
+  method_not_allowed_status: 405
+  verbatim_405: 'Method Not Allowed — only GET is supported'
+  note: >-
+    The documented 405 text says "only GET is supported", which contradicts the two POST
+    operations the same document defines (POST /v1/carriers/query, POST /v1/vins). Stale copy.
+
+conditional_requests:
+  etag: false
+  last_modified: false
+  documented: false
+
+content_negotiation:
+  request: application/json
+  response: application/json
+  alternatives: none published

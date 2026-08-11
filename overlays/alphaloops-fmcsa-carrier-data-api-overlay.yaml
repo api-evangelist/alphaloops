@@ -1,0 +1,265 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements — AlphaLoops FMCSA Carrier Data API
+  version: 1.0.0
+extends: ../openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
+
+# generated: '2026-08-11'
+# method: generated
+# source: >-
+#   Authored by API Evangelist against the live provider spec fetched from
+#   https://runalphaloops.com/openapi.json on 2026-08-11. This overlay carries OUR enhancements
+#   only — it never mutates the original, which is preserved verbatim at
+#   openapi/_original/alphaloops-fmcsa-carrier-data-api-openapi.json.
+#
+# WHAT THIS OVERLAY FIXES, and why each item is a real defect rather than a preference:
+#   1. tags is an empty array and NO operation is tagged, so the 25 operations have no navigable
+#      grouping in any renderer or catalog. We add eight tags and tag every operation.
+#   2. Pagination style is split between page/limit and offset/limit with no machine-readable
+#      marker, and the provider warns about it only in prose. We annotate each affected operation
+#      with x-pagination so a client can branch on it.
+#   3. The collection array is named differently in nearly every response envelope. We record the
+#      real key per operation as x-results-key.
+#   4. Rate-limit headers are returned on every response and documented in prose, but declared
+#      nowhere in the spec. We document them at the info level as x-rate-limit.
+#   5. enrichContact is credit-metered with a 402 path; searchContacts can return 202. Both are
+#      commercial/runtime facts absent from the contract. We annotate them.
+#   6. 500 and 502 are documented in the provider's own error table but declared on no operation.
+#      We note this at info level rather than inventing response objects.
+
+actions:
+  # --- 1. Tag vocabulary + external docs -----------------------------------------------------
+  - target: $
+    description: Add a tag vocabulary; the source spec declares an empty tags array.
+    update:
+      tags:
+        - name: Carriers
+          description: Carrier lookup, search, filtering and profile retrieval.
+        - name: Authority
+          description: Operating authority history and insurance filings.
+        - name: Fleet
+          description: VIN-level trucks and trailers.
+        - name: Safety
+          description: Roadside inspections, violations and crash history.
+        - name: Risk
+          description: Fraud, chameleon-carrier and financial-distress signals.
+        - name: Contacts
+          description: Decision-maker search and metered enrichment.
+        - name: VINs
+          description: VIN lookup and VIN-to-carrier association.
+        - name: Signals
+          description: Change events, news and market listings.
+      externalDocs:
+        description: AlphaLoops FMCSA API reference
+        url: https://runalphaloops.com/fmcsa-api/docs
+
+  # --- 2. Info-level runtime semantics --------------------------------------------------------
+  - target: $.info
+    description: >-
+      Record the runtime contract the provider documents in prose but does not express in the spec.
+    update:
+      x-rate-limit:
+        tier: Enterprise REST
+        per_minute: 60
+        per_day: 5000
+        headers_on_every_response:
+          - X-RateLimit-Limit
+          - X-RateLimit-Remaining
+          - X-RateLimit-Reset
+          - X-DailyLimit-Limit
+          - X-DailyLimit-Remaining
+          - X-DailyLimit-Reset
+        exhausted_status: 429
+        retry_after: true
+        source: https://runalphaloops.com/fmcsa-api/docs
+      x-error-envelope:
+        shape: '{"error": "...", "message": "..."}'
+        rfc9457: false
+        enumerated_error_values: false
+      x-undeclared-responses:
+        note: >-
+          The provider's published error table documents 405, 500 and 502, none of which is
+          declared on any operation in this spec. 405's stated rule ("only GET is supported")
+          also contradicts the two POST operations the spec defines.
+        statuses: [405, 500, 502]
+      x-cors:
+        preflight: 'OPTIONS -> 204'
+        allow_origin: '*'
+        caution: >-
+          Wildcard origin with a static unscoped bearer key — browser use exposes the credential.
+      x-pagination-warning: >-
+        Two pagination styles coexist. page/limit is the default; trucks, trailers, inspections,
+        authority and timeline use offset/limit instead.
+      x-artifacts:
+        conventions: conventions/alphaloops-conventions.yml
+        errors: errors/alphaloops-problem-types.yml
+        rate_limits: rate-limits/alphaloops-rate-limits.yml
+        data_model: data-model/alphaloops-data-model.yml
+        mcp_crosswalk: mcp/alphaloops-tool-crosswalk.yml
+
+  # --- 3. Carriers -----------------------------------------------------------------------------
+  - target: $.paths['/v1/carriers/{dot_number}'].get
+    update:
+      tags: [Carriers]
+      x-field-projection: true
+      x-results-key: null
+  - target: $.paths['/v1/carriers/mc/{mc_number}'].get
+    update:
+      tags: [Carriers]
+      x-field-projection: true
+      x-mc-number-format-note: >-
+        Provider examples show both bare ("183261") and prefixed ("MC-728261") forms; no canonical
+        form is stated.
+  - target: $.paths['/v1/carriers/search'].get
+    update:
+      tags: [Carriers]
+      x-pagination: {style: page-limit, params: [page, limit], default_limit: 10, max_limit: 50}
+      x-results-key: results
+      x-required-query-param: company_name
+      x-confidence-scored: true
+  - target: $.paths['/v1/carriers/query'].post
+    update:
+      tags: [Carriers]
+      x-pagination: {style: page-limit, params: [page, limit], default_limit: 25}
+      x-results-key: results
+      x-field-projection: {style: body-array, param: fields}
+      x-capability: >-
+        The most capable operation in the API — include/exclude filters, range objects, array
+        membership, geo-radius, sorting.
+  - target: $.paths['/v1/carriers/{dot_number}/overview'].get
+    update:
+      tags: [Carriers]
+  - target: $.paths['/v1/carriers/{dot_number}/similar'].get
+    update:
+      tags: [Carriers]
+      x-results-key: similar_carriers
+      x-powered-by: carrier embedding model
+
+  # --- 4. Authority + insurance ----------------------------------------------------------------
+  - target: $.paths['/v1/carriers/{dot_number}/authority'].get
+    update:
+      tags: [Authority]
+      x-pagination: {style: offset-limit, params: [offset, limit], default_limit: 50}
+      x-results-key: authority_history
+  - target: $.paths['/v1/carriers/{dot_number}/insurance'].get
+    update:
+      tags: [Authority]
+      x-pagination: {style: page-limit, params: [page, limit]}
+      x-results-key: insurance
+  - target: $.paths['/v1/carriers/mc/{mc_number}/insurance'].get
+    update:
+      tags: [Authority]
+      x-results-key: insurance
+
+  # --- 5. Fleet ---------------------------------------------------------------------------------
+  - target: $.paths['/v1/carriers/{dot_number}/trucks'].get
+    update:
+      tags: [Fleet]
+      x-pagination: {style: offset-limit, params: [offset, limit], default_limit: 50}
+      x-results-key: trucks
+  - target: $.paths['/v1/carriers/{dot_number}/trailers'].get
+    update:
+      tags: [Fleet]
+      x-pagination: {style: offset-limit, params: [offset, limit], default_limit: 50}
+      x-results-key: trailers
+
+  # --- 6. Safety ---------------------------------------------------------------------------------
+  - target: $.paths['/v1/carriers/{dot_number}/inspections'].get
+    update:
+      tags: [Safety]
+      x-pagination: {style: offset-limit, params: [offset, limit], default_limit: 50}
+      x-results-key: inspections
+  - target: $.paths['/v1/inspections/{inspection_id}/violations'].get
+    update:
+      tags: [Safety]
+      x-pagination: {style: page-limit, params: [page, limit]}
+      x-results-key: violations
+  - target: $.paths['/v1/carriers/{dot_number}/crashes'].get
+    update:
+      tags: [Safety]
+      x-pagination: {style: page-limit, params: [page, limit]}
+      x-results-key: crashes
+      x-enum-severity: [FATAL, INJURY, TOW, PROPERTY_DAMAGE]
+
+  # --- 7. Risk + signals -------------------------------------------------------------------------
+  - target: $.paths['/v1/carriers/{dot_number}/risk-signals'].get
+    update:
+      tags: [Risk]
+  - target: $.paths['/v1/carriers/{dot_number}/connections'].get
+    update:
+      tags: [Risk]
+      x-response-shape: graph
+      x-results-key: [nodes, edges]
+  - target: $.paths['/v1/carriers/{dot_number}/mc-sales'].get
+    update:
+      tags: [Risk]
+      x-results-key: mc_sale
+      x-missing-404: >-
+        Unlike every other carrier sub-resource, this operation declares no 404 response. A client
+        cannot distinguish an unknown DOT number from a carrier with no listing.
+  - target: $.paths['/v1/carriers/{dot_number}/equipment-for-sale'].get
+    update:
+      tags: [Risk]
+      x-pagination: {style: page-limit, params: [page, limit]}
+      x-results-key: equipment
+  - target: $.paths['/v1/carriers/{dot_number}/timeline'].get
+    update:
+      tags: [Signals]
+      x-pagination: {style: offset-limit, params: [offset, limit], default_limit: 50}
+      x-results-key: events
+      x-change-feed: >-
+        Change-data-capture over the carrier record (event_type, field_name, old_value, new_value,
+        source). The documented polling substitute for the webhooks AlphaLoops sells but does not
+        specify.
+  - target: $.paths['/v1/carriers/{dot_number}/news'].get
+    update:
+      tags: [Signals]
+      x-results-key: articles
+
+  # --- 8. Contacts — the metered, async surface --------------------------------------------------
+  - target: $.paths['/v1/contacts/search'].get
+    update:
+      tags: [Contacts]
+      x-pagination: {style: page-limit, params: [page, limit]}
+      x-results-key: contacts
+      x-enum-levels: [c_suite, vp, director, manager]
+      x-async: >-
+        Can return 202 Accepted — contacts are fetched asynchronously and the client must re-issue
+        the request after a delay. No Location header, job id, or recommended poll interval is
+        published, so the client must choose its own backoff. This is a SUCCESS path, not an error.
+      x-pii: true
+  - target: $.paths['/v1/contacts/{contact_id}/enrich'].get
+    update:
+      tags: [Contacts]
+      x-metered:
+        unit: enrichment credit
+        cost: 1 per new enrichment
+        cached_cost: 0
+        balance_header: X-Enrichment-Credits-Remaining
+        balance_body_field: credits
+        exhausted_status: 402
+        retryable: false
+      x-pii:
+        returns: [work_email, personal_emails, phone_numbers, mobile_phone, location_name, experience, education]
+        note: >-
+          The only operation returning personal data about a named individual. Provider claims
+          GDPR/CCPA compliance for the contact dataset; lawful basis for downstream use rests with
+          the caller.
+
+  # --- 9. VINs ------------------------------------------------------------------------------------
+  - target: $.paths['/v1/vins'].get
+    update:
+      tags: [VINs]
+      x-results-key: results
+  - target: $.paths['/v1/vins'].post
+    update:
+      tags: [VINs]
+      x-results-key: results
+      x-batch: true
+  - target: $.paths['/v1/inspections/vin/{vin}'].get
+    update:
+      tags: [VINs, Safety]
+      x-results-key: [dot_numbers, locations]
+      x-reverse-lookup: >-
+        Resolves a VIN back to the carriers it has been associated with — the mechanism for
+        spotting equipment moving between a revoked carrier and its successor.

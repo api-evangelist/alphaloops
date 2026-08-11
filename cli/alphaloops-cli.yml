@@ -1,0 +1,135 @@
+generated: '2026-08-11'
+method: searched
+source: https://github.com/RunAlphaLoop/freight-cli
+description: >-
+  AlphaLoops ships a first-party command-line client, `loopsh`, published to PyPI as
+  alphaloops-freight-cli from the RunAlphaLoop GitHub organization. It is built on the AlphaLoops
+  Freight SDK and is explicitly positioned as agent-facing — it ships a provider-authored agent
+  usage guide (AGENTS.md) and can print equivalent SDK code instead of executing.
+
+name: loopsh
+package: alphaloops-freight-cli
+repository: https://github.com/RunAlphaLoop/freight-cli
+license: MIT
+language: python
+requires_python: '>=3.9'
+version: 0.4.0
+published: '2026-03-11'
+built_on: https://github.com/RunAlphaLoop/freight-sdk
+docs: https://runalphaloops.com/fmcsa-api/docs
+cross_ref: packages/alphaloops-packages.yml
+
+install:
+  - method: pip
+    command: pip install alphaloops-freight-cli
+homebrew: false
+standalone_binary: false
+
+authentication:
+  methods:
+    - {form: 'loopsh login <key>', stores: '~/.alphaloops'}
+    - {form: 'export ALPHALOOPS_API_KEY=<key>', kind: environment variable}
+    - {form: 'loopsh --api-key <key> ...', kind: per-invocation flag}
+  config_discovery: >-
+    Walks up from the current working directory to $HOME looking for a `.alphaloops` file, so a
+    project-local key can override the user-level one.
+  verify: loopsh whoami
+  key_prefix_documented: ak_
+  key_prefix_anomaly: >-
+    The CLI README and AGENTS.md both show keys prefixed `ak_`, while the live MCP server's 401
+    body instructs "Pass your AlphaLoops API key as: Authorization: Bearer al_...". Two different
+    documented prefixes for the same credential. One of the two is stale.
+
+global_flags:
+  - {flag: '--json', description: 'Emit raw JSON instead of pretty tables. Documented as required for scripts and agent tool calls.'}
+  - {flag: '--python', description: 'Print the equivalent Python SDK code instead of running the command.'}
+  - {flag: '--typescript', description: 'Print the equivalent TypeScript SDK code instead of running the command.'}
+  - {flag: '--api-key', description: 'Supply the API key inline.'}
+
+command_groups:
+  - group: auth
+    commands:
+      - {command: 'loopsh login <key>', description: 'Save API key to ~/.alphaloops'}
+      - {command: 'loopsh whoami', description: 'Confirm authentication'}
+  - group: carriers
+    rest_operations: [getCarrierByDot, getCarrierByMc, searchCarriers, getCarrierAuthority, getCarrierNews]
+    commands:
+      - {command: 'loopsh carriers get <dot>', description: 'Carrier profile by DOT number', flags: ['--fields']}
+      - {command: 'loopsh carriers <dot>', description: 'Shortcut for carriers get'}
+      - {command: 'loopsh carriers mc <mc>', description: 'Carrier profile by MC/MX docket number'}
+      - {command: 'loopsh carriers search <name>', description: 'Fuzzy name search', flags: ['--state', '--city', '--limit', '--page']}
+      - {command: 'loopsh carriers authority <dot>', description: 'Authority history — grants, revocations, reinstatements'}
+      - {command: 'loopsh carriers news <dot>', description: 'News and press mentions', flags: ['--start-date', '--end-date']}
+  - group: fleet
+    rest_operations: [getCarrierTrucks, getCarrierTrailers]
+    commands:
+      - {command: 'loopsh fleet trucks <dot>', description: 'Registered trucks', flags: ['--limit', '--offset']}
+      - {command: 'loopsh fleet <dot>', description: 'Shortcut for fleet trucks'}
+      - {command: 'loopsh fleet trailers <dot>', description: 'Registered trailers'}
+  - group: inspections
+    rest_operations: [getCarrierInspections, getInspectionViolations]
+    commands:
+      - {command: 'loopsh inspections list <dot>', description: 'Roadside inspections'}
+      - {command: 'loopsh inspections <dot>', description: 'Shortcut for inspections list'}
+      - {command: 'loopsh inspections violations <inspection_id>', description: 'Violations for an inspection'}
+  - group: crashes
+    rest_operations: [getCarrierCrashes]
+    commands:
+      - {command: 'loopsh crashes list <dot>', description: 'Crash history', flags: ['--severity', '--start-date', '--end-date']}
+      - {command: 'loopsh crashes <dot>', description: 'Shortcut for crashes list'}
+    enums:
+      severity: [FATAL, INJURY, TOW, PROPERTY_DAMAGE]
+  - group: contacts
+    rest_operations: [searchContacts, enrichContact]
+    commands:
+      - {command: 'loopsh contacts search', description: 'Find contacts at a carrier', flags: ['--dot', '--company', '--title', '--levels']}
+      - {command: 'loopsh contacts enrich <contact_id>', description: 'Enrich a contact — adds email, phone, work history. Costs 1 credit.'}
+    enums:
+      levels: [c_suite, vp, director, manager]
+
+key_flows:
+  - name: Qualify a carrier by name
+    steps:
+      - 'DOT=$(loopsh --json carriers search "Acme Freight" | jq -r ''.results[0].dot_number'')'
+      - 'loopsh --json carriers get "$DOT"'
+  - name: Find decision-makers at a carrier
+    steps:
+      - 'loopsh --json contacts search --dot "$DOT" --levels c_suite,vp'
+  - name: Safety due-diligence snapshot
+    steps:
+      - 'loopsh --json carriers get "$DOT"'
+      - 'loopsh --json crashes "$DOT" --severity FATAL'
+      - 'loopsh --json inspections "$DOT"'
+  - name: Paginate all search results
+    steps:
+      - 'Loop page 1..pagination.total_pages on carriers search with --page/--limit'
+  - name: Generate SDK code for any command
+    steps:
+      - 'loopsh --python carriers search "Werner" --state NE'
+      - 'loopsh --typescript contacts enrich <contact_id>'
+
+agent_affordances:
+  agents_md: alphaloops/AGENTS.md
+  agents_md_url: https://github.com/RunAlphaLoop/freight-cli/blob/HEAD/alphaloops/AGENTS.md
+  saved_verbatim: skills/alphaloops-AGENTS.md
+  json_mode: true
+  codegen_mode: true
+  note: >-
+    The `--python` / `--typescript` codegen flags are an unusual and genuinely useful affordance:
+    an agent can use the CLI to discover the correct SDK call without executing a billed request.
+
+coverage_gap: >-
+  The CLI covers 12 of the 25 REST operations. Absent: insurance, timeline, mc-sales,
+  equipment-for-sale, connections, risk-signals, similar, overview, the VIN endpoints and the
+  POST /v1/carriers/query advanced filter — which is the API's most capable operation. Same
+  five-resource footprint as the SDKs. See packages/alphaloops-packages.yml.
+
+evidence:
+  - url: https://github.com/RunAlphaLoop/freight-cli
+    http_status: 200
+  - url: https://raw.githubusercontent.com/RunAlphaLoop/freight-cli/HEAD/README.md
+    http_status: 200
+  - url: https://raw.githubusercontent.com/RunAlphaLoop/freight-cli/HEAD/alphaloops/AGENTS.md
+    http_status: 200
+  - url: https://pypi.org/pypi/alphaloops-freight-cli/json
+    http_status: 200

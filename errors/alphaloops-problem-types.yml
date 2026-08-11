@@ -1,0 +1,171 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/fmcsa-api/docs
+description: >-
+  Error catalog for the AlphaLoops FMCSA Carrier Data API. Derived from the 4xx/5xx responses in
+  the live OpenAPI 3.1 and enriched from the provider's published "Error Codes" table and
+  "Error Response Format" note in the API reference.
+
+format: proprietary-json
+rfc9457: false
+content_type: application/json
+envelope:
+  shape: '{"error": "Short error type", "message": "Human-readable description of what went wrong."}'
+  schema_ref: '#/components/schemas/Error'
+  required: [error, message]
+  fields:
+    - name: error
+      type: string
+      description: Short error type
+      enumerated: false
+      note: >-
+        No published enumeration of the values this field can take, so a client cannot branch on it
+        safely. This is the single change that would most improve programmatic error handling —
+        publish the value set, or adopt RFC 9457 type URIs.
+    - name: message
+      type: string
+      description: Human-readable description
+consistency: >-
+  Uniform across every operation. The OpenAPI declares four reusable responses (BadRequest,
+  Unauthorized, NotFound, RateLimited) in components.responses and $refs them, so the envelope
+  cannot drift per-operation.
+
+problem_types:
+  - status: 400
+    key: BadRequest
+    title: Bad Request
+    description: Invalid parameters
+    openapi_response: '#/components/responses/BadRequest'
+    operations: [searchCarriers, queryCarriers, lookupVins, lookupVinsBatch]
+    remediation: >-
+      Check the parameter table for the endpoint. Note company_name is required on
+      GET /v1/carriers/search, and limit is capped at 50 there.
+    retryable: false
+
+  - status: 401
+    key: Unauthorized
+    title: Unauthorized
+    description: Invalid or missing API key
+    openapi_response: '#/components/responses/Unauthorized'
+    operations: all
+    remediation: >-
+      Send 'Authorization: Bearer <key>'. Keys are issued by AlphaLoops sales, not self-service.
+      The MCP surface returns the same status with a WWW-Authenticate challenge.
+    retryable: false
+
+  - status: 402
+    key: PaymentRequired
+    title: Payment Required
+    description: Enrichment credits exhausted
+    openapi_response: inline (schema Error)
+    operations: [enrichContact]
+    remediation: >-
+      Purchase additional enrichment credits (pricing-page add-on ladder starts at 1,000
+      credits/month for $500). Check X-Enrichment-Credits-Remaining or the `credits` object in the
+      previous successful response to avoid hitting this. Cached re-enrichments do not consume a
+      credit.
+    retryable: false
+    metered: true
+
+  - status: 404
+    key: NotFound
+    title: Not Found
+    description: Carrier does not exist
+    openapi_response: '#/components/responses/NotFound'
+    operations:
+      - getCarrierByDot
+      - getCarrierByMc
+      - getCarrierAuthority
+      - getCarrierTrucks
+      - getCarrierTrailers
+      - getCarrierInspections
+      - getInspectionViolations
+      - getCarrierCrashes
+      - getCarrierNews
+      - enrichContact
+      - getCarrierInsurance
+      - getCarrierInsuranceByMc
+      - getCarrierTimeline
+      - getCarrierEquipmentForSale
+      - getCarrierConnections
+      - getCarrierRiskSignals
+      - getSimilarCarriers
+      - getCarrierOverview
+      - getVinInspectionHistory
+    remediation: >-
+      Resolve the identifier first via GET /v1/carriers/search. Note the CLI agent guide
+      distinguishes "carrier not found" from an empty sub-resource ("No trucks found.",
+      "No inspections found.") — the latter is a 200 with an empty results array, not a 404.
+    retryable: false
+
+  - status: 405
+    key: MethodNotAllowed
+    title: Method Not Allowed
+    description: 'Documented verbatim as: "only GET is supported"'
+    openapi_response: not declared
+    operations: none declared
+    remediation: Use the method named in the endpoint reference.
+    retryable: false
+    anomaly: >-
+      Documented in the error table but declared on no operation in the OpenAPI, and its stated
+      rule ("only GET is supported") contradicts the two POST operations the same reference
+      defines — POST /v1/carriers/query and POST /v1/vins. Stale documentation copy.
+
+  - status: 429
+    key: RateLimited
+    title: Too Many Requests
+    description: 'Too many requests. Check X-RateLimit-Remaining and Retry-After headers.'
+    openapi_response: '#/components/responses/RateLimited'
+    operations: all
+    headers:
+      Retry-After: {type: integer, description: Seconds to wait before retrying}
+    remediation: >-
+      Honour Retry-After. Pace against both windows — 60/minute and 5,000/day on the Enterprise
+      REST tier — using the X-RateLimit-* and X-DailyLimit-* headers returned on every response.
+    retryable: true
+    backoff: Retry-After (server-directed)
+
+  - status: 500
+    key: InternalServerError
+    title: Internal Server Error
+    description: Internal Server Error
+    openapi_response: not declared
+    remediation: Retry with exponential backoff; escalate via support if persistent.
+    retryable: true
+
+  - status: 502
+    key: BadGateway
+    title: Bad Gateway
+    description: 'Upstream service (freight API or news provider) failed'
+    openapi_response: not declared
+    remediation: >-
+      Retry with backoff. Notable for disclosing the dependency shape — carrier and news data are
+      served through upstream providers, so a 502 here is an upstream outage rather than an
+      AlphaLoops fault.
+    retryable: true
+
+# Not an error, but a non-2xx-shaped success an integrator must handle.
+deferred_results:
+  - status: 202
+    key: Accepted
+    operations: [searchContacts]
+    description: 'Accepted — contacts are being fetched asynchronously, retry after delay'
+    remediation: >-
+      Re-issue the same request after a delay. No Location header, job id, or recommended poll
+      interval is published, so the client must choose its own backoff.
+    gap: true
+
+gaps:
+  - 500 and 502 appear in the documented error table but are declared on no operation in the OpenAPI.
+  - 405 is documented with a rule that contradicts the spec's own POST operations.
+  - The `error` field has no published enumeration, so failures cannot be branched on programmatically.
+  - No RFC 9457 application/problem+json representation, no type URIs, no error-code registry.
+  - No request/correlation id is returned on failures, making support escalation harder.
+
+evidence:
+  - url: https://runalphaloops.com/fmcsa-api/docs
+    http_status: 200
+    note: Error Codes table and Error Response Format section.
+  - url: https://runalphaloops.com/openapi.json
+    http_status: 200
+    note: components.responses and components.schemas.Error.

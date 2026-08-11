@@ -1,0 +1,153 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/whats-new
+description: >-
+  AlphaLoops publishes a dated product changelog at /whats-new, filterable by Feature Releases,
+  Data & Model Updates and Integration Updates, with each entry linking to a full post. It is a
+  product changelog, not an API changelog — entries describe platform capabilities and
+  integrations, and no entry records an API contract change (added endpoint, changed field,
+  deprecation, version bump).
+
+url: https://runalphaloops.com/whats-new
+http_status: 200
+scheme: dated product updates, newest first, grouped by month
+categories: [Feature Release, Data Update, Integration Update]
+subscribe: email ("Get product updates delivered to your inbox")
+rss: none found
+api_specific: false
+current_api_version: v1 (OpenAPI info.version 1.0.0)
+
+# CURRENCY — the changelog stops in May. Entries run January to May 2026 with steady monthly
+# cadence, then nothing for June, July or the first eleven days of August 2026. The month filter
+# on the page itself offers only "2026 May April March February January". Three months of silence
+# on a page whose promise is "every feature we ship... tracked here as it happens" is the finding.
+currency:
+  newest_entry: '2026-05-19'
+  oldest_entry_listed: '2026-01-08'
+  months_covered: [January, February, March, April, May]
+  months_missing: [June, July, August]
+  days_since_last_entry_at_pass: 84
+  cadence_observed: 3-4 entries per month January–May 2026, then zero
+
+entries:
+  - date: '2026-05-19'
+    category: Data Update
+    title: Introducing Estimated Fleet Value
+    breaking: false
+    highlights: >-
+      Dollar estimate of the equipment a carrier is running, built from inspection records rather
+      than registration paperwork; per-unit values on individual trucks and trailers.
+    api_impact: not stated
+  - date: '2026-05-18'
+    category: Feature Release
+    title: 'Carrier Risk Scoring, Rebuilt: Why We Stopped Treating Single Events As Evidence'
+    breaking: false
+    highlights: >-
+      Risk Signals rebuilt around aged-MC-purchase fraud patterns; roughly half of cargo-theft
+      incidents now involve carriers with clean operating histories.
+    api_impact: 'Relates to GET /v1/carriers/{dot_number}/risk-signals; no contract change stated.'
+  - date: '2026-05-11'
+    category: Integration Update
+    title: AlphaLoops in n8n — Wire Carrier Data Into Anything
+    breaking: false
+    highlights: Verified n8n community node for DOT lookups, contact enrichment, fleet and safety data.
+    related_package: n8n-nodes-alphaloops-freight
+  - date: '2026-04-28'
+    category: Data Update
+    title: Annual Fuel Gallons Estimates Now Available for Every Carrier
+    breaking: false
+  - date: '2026-04-23'
+    category: Data Update
+    title: Intent Signals — Know Which Carriers Are In-Market
+    breaking: false
+    flagged_new: true
+  - date: '2026-04-20'
+    category: Integration Update
+    title: 'What''s New: Salesforce Sync, Rebuilt'
+    breaking: false
+  - date: '2026-04-01'
+    category: Feature Release
+    title: AlphaLoops just got a lot smarter
+    breaking: false
+    flagged_new: true
+    highlights: AI Workspace, explainable scoring, auto-generated outreach, cross-object list building, alerts.
+  - date: '2026-03-16'
+    category: Integration Update
+    title: Search Carriers with AI Using the AlphaLoops MCP Server
+    breaking: false
+    flagged_new: true
+    highlights: MCP server launch — carrier lookup and search inside Claude, ChatGPT or any MCP client.
+    api_impact: Introduces the hosted MCP surface at mcp-freight.runalphaloops.com/mcp.
+  - date: '2026-03-11'
+    category: Data Update
+    title: AlphaLoops Developer SDKs and CLI — Now Available
+    breaking: false
+    highlights: >-
+      Python and TypeScript SDKs plus the loopsh CLI wrapping the AlphaLoops API; programmatic
+      access to 2.3M+ carrier profiles, fleet, inspections, crash history and contacts.
+    api_impact: Introduces the published client surface. See packages/ and cli/.
+    note: >-
+      States 2.3M+ carrier profiles; the MCP page and site now say 2.7M. The growth is real but
+      the changelog is the only dated anchor for either figure.
+  - date: '2026-03-06'
+    category: Feature Release
+    title: 'Introducing Map View: Find and List Carriers by Location'
+    breaking: false
+  - date: '2026-03-06'
+    category: Data Update
+    title: Carrier Vector Embeddings — 800K+ Fleet Profiles
+    breaking: false
+    highlights: Embeddings powering CarrierMatch similarity; relates to the carrier_similar MCP tool and getSimilarCarriers.
+  - date: '2026-03-06'
+    category: Feature Release
+    title: Carrier Relationships — Network Graph
+    breaking: false
+    flagged_new: true
+    highlights: Connected carrier entities across shared VINs, officers, phone numbers and addresses; shell/chameleon detection.
+    api_impact: 'Relates to GET /v1/carriers/{dot_number}/connections.'
+  - date: '2026-02-18'
+    category: Feature Release
+    title: Risk Signals — AI Monitoring for Carrier Fraud
+    breaking: false
+  - date: '2026-02-06'
+    category: Integration Update
+    title: HubSpot Sync — Carrier Enrichment v2
+    breaking: false
+    highlights: Bidirectional sync with custom field mapping and webhook support.
+    note: One of the few public mentions of webhooks; no webhook documentation is published.
+  - date: '2026-02-02'
+    category: Feature Release
+    title: MC Authority Sales Detection
+    breaking: false
+    api_impact: 'Relates to GET /v1/carriers/{dot_number}/mc-sales and the watchlist_mc_sales MCP tool.'
+  - date: '2026-01-22'
+    category: Data Update
+    title: Telematics Coverage Expanded — 100+ Providers
+    breaking: false
+  - date: '2026-01-08'
+    category: Feature Release
+    title: CarrierMatch.io — Lookalike Carrier Scoring
+    breaking: false
+
+# Entries present in the sitemap but not surfaced in the month-grouped listing captured on this
+# pass — recorded because they evidence surface the changelog page itself did not show.
+additional_entries_in_sitemap:
+  - slug: introducing-the-alphaloops-chrome-extension
+    url: https://runalphaloops.com/whats-new/introducing-the-alphaloops-chrome-extension
+  - slug: alphaloops-now-connects-to-9-000-apps-with-zapier
+    url: https://runalphaloops.com/whats-new/alphaloops-now-connects-to-9-000-apps-with-zapier
+    note: Zapier integration — a further distribution surface not represented in packages/ or the API docs.
+  - slug: alphaloops-now-has-an-mcp-server
+    url: https://runalphaloops.com/whats-new/alphaloops-now-has-an-mcp-server
+
+gaps:
+  - No API-specific changelog. Contract changes (new endpoints, field additions, the "COMING SOON" safety endpoint) are not tracked anywhere dated.
+  - No RSS/Atom or JSON feed — the changelog cannot be watched programmatically, only by scraping or email subscription.
+  - No entry since 2026-05-19 despite continued SDK (2026-04-29) and repository (2026-06-20, 2026-07-24) activity.
+
+evidence:
+  - url: https://runalphaloops.com/whats-new
+    http_status: 200
+  - url: https://runalphaloops.com/sitemap.xml
+    http_status: 200
+    note: 463 URLs; used to enumerate changelog entry slugs.

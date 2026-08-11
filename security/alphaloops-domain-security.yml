@@ -1,0 +1,21 @@
+generated: '2026-08-11'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: runalphaloops.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 30 07:04:40 2026 GMT
+  hsts: false
+- host: api.runalphaloops.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct  7 22:23:47 2026 GMT
+  hsts: null
+domains:
+- domain: runalphaloops.com
+  dnssec: false
+  caa: []
+  spf: false
+  dmarc: true
+  dmarc_policy: none

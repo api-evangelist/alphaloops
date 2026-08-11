@@ -1,0 +1,94 @@
+generated: '2026-08-11'
+method: generated
+source: >-
+  One provider-published guide saved verbatim, plus two packaged Agent Skills generated from the
+  live OpenAPI (openapi/alphaloops-fmcsa-carrier-data-api-openapi.json). Every operationId
+  referenced in the generated skills was grepped out of that spec — none is invented.
+description: >-
+  Agent Skills for the AlphaLoops FMCSA Carrier Data API, organised around the two flows the
+  provider's own guides and CLI examples are built on: vetting a carrier before doing business
+  with it, and prospecting for carriers to sell to.
+
+skills:
+  - file: alphaloops-AGENTS.md
+    name: loopsh — Agent Usage Guide
+    method: searched
+    source: https://raw.githubusercontent.com/RunAlphaLoop/freight-cli/HEAD/alphaloops/AGENTS.md
+    http_status: 200
+    provider_published: true
+    surface: CLI
+    description: >-
+      AlphaLoops' own agent usage guide for the loopsh CLI, saved VERBATIM. Covers installation and
+      auth, key concepts, the full command reference, jq pipeline patterns, real JSON response
+      shapes for every command group, error handling, and five worked agent workflows. This is a
+      genuine first-party agent artifact — the provider wrote an AGENTS.md for its CLI and ships it
+      inside the installed package.
+    note: >-
+      Documents the five CLI command groups only (carriers, fleet, inspections, crashes, contacts).
+      It does not reach the insurance, timeline, mc-sales, equipment-for-sale, connections,
+      risk-signals, similar, overview or VIN operations, which exist in the REST API but not in the
+      CLI. The two generated skills below cover that gap.
+
+  - file: alphaloops-carrier-vetting.md
+    name: alphaloops-carrier-vetting
+    method: generated
+    surface: REST
+    description: >-
+      Vet a carrier before booking a load or writing a policy: resolve identity, confirm authority
+      and insurance, read the safety record, check chameleon/fraud risk signals and the corporate
+      connection graph.
+    operations:
+      - searchCarriers
+      - getCarrierByDot
+      - getCarrierByMc
+      - getCarrierAuthority
+      - getCarrierInsurance
+      - getCarrierInspections
+      - getCarrierCrashes
+      - getCarrierRiskSignals
+      - getCarrierConnections
+      - getCarrierMcSales
+
+  - file: alphaloops-carrier-prospecting.md
+    name: alphaloops-carrier-prospecting
+    method: generated
+    surface: REST
+    description: >-
+      Build a targeted carrier list and reach the decision-makers: advanced filtered query,
+      lookalike expansion, equipment and change-event qualification, contact search and metered
+      enrichment.
+    operations:
+      - queryCarriers
+      - searchCarriers
+      - getSimilarCarriers
+      - getCarrierByDot
+      - getCarrierOverview
+      - searchContacts
+      - enrichContact
+      - getCarrierTrucks
+      - getCarrierTrailers
+      - getCarrierTimeline
+
+coverage:
+  rest_operations_total: 25
+  operations_covered_by_generated_skills: 18
+  uncovered:
+    - getInspectionViolations
+    - getCarrierNews
+    - getCarrierInsuranceByMc
+    - getCarrierEquipmentForSale
+    - getVinInspectionHistory
+    - lookupVins
+    - lookupVinsBatch
+  note: >-
+    getInspectionViolations and getCarrierNews are referenced inline within the vetting skill but
+    are not primary steps. The VIN lookup family (getVinInspectionHistory, lookupVins,
+    lookupVinsBatch) is a distinct equipment-identification flow that would warrant its own skill;
+    it is also the family with no MCP tool coverage — see mcp/alphaloops-tool-crosswalk.yml.
+
+cross_references:
+  conventions: conventions/alphaloops-conventions.yml
+  errors: errors/alphaloops-problem-types.yml
+  rate_limits: rate-limits/alphaloops-rate-limits.yml
+  authentication: authentication/alphaloops-authentication.yml
+  mcp_tools: mcp/alphaloops-tool-crosswalk.yml

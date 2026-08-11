@@ -1,0 +1,140 @@
+generated: '2026-08-11'
+method: searched
+source: https://runalphaloops.com/mcp
+description: >-
+  Versioning, deprecation, status and SLA posture for AlphaLoops. Assembled from the MCP reference
+  page (which carries the only published versioning and deprecation policy), the API reference, the
+  live status page, and the live OpenAPI.
+
+versioning:
+  rest:
+    style: uri-path
+    current_version: v1
+    prefix: /v1/
+    spec_info_version: 1.0.0
+    policy_published: false
+    note: >-
+      The REST surface is path-versioned at /v1/ but publishes NO versioning policy — nothing states
+      what constitutes a breaking change, how a v2 would be introduced, or how long v1 is supported.
+  mcp:
+    style: header-pinned
+    header: X-AlphaLoops-Version
+    default_when_omitted: latest
+    policy_published: true
+    verbatim: >-
+      "Tool schemas are header-pinned via the X-AlphaLoops-Version header. Without the header, you
+      receive the latest version. Breaking changes are released under a new version with a 90-day
+      deprecation window for the prior version. Additive changes ship continuously without a
+      version bump."
+    source: https://runalphaloops.com/mcp
+  asymmetry_note: >-
+    The agent surface has a better-specified version contract than the REST surface it wraps. Note
+    also the default: omitting the header floats you to latest, so an unpinned MCP client inherits
+    breaking changes at the 90-day boundary whether or not it is ready.
+
+deprecation:
+  policy_published: true
+  scope: MCP tool schemas only
+  window: 90 days
+  mechanism: New version issued; prior version supported for the deprecation window.
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    A stated 90-day window is real policy and better than most, but it is prose on a marketing
+    reference page — not RFC 8594 Sunset/Deprecation response headers, and not applied to REST.
+  deprecated_operations_in_spec: []
+  spec_scan: >-
+    No operation in the OpenAPI carries `deprecated: true`. One endpoint is marked forward-looking
+    rather than deprecated — GET /v1/carriers/{dot_number}/safety is labelled "COMING SOON" in the
+    documentation and is absent from the OpenAPI entirely, so the docs describe a surface the
+    contract does not yet contain.
+
+status_page:
+  url: https://status.runalphaloops.com
+  http_status: 200
+  provider: third-party hosted status page
+  machine_readable_feed: none found
+  last_updated_observed: '2026-08-11 21:06 UTC'
+  overall_state_observed: All services are online
+  monitored_services:
+    - name: runalphaloops.com
+      state: Operational
+      uptime_90d: 99.945%
+    - name: AlphaFreight Application
+      state: Operational
+  history_window: 90 days
+  monitoring_started: '2026-06-09'
+  note: >-
+    Monitoring only began on 2026-06-09 — every day from the start of the 90-day window to
+    2026-06-08 reports "Not monitored", so the 99.945% figure covers roughly two months, not ninety
+    days.
+  incidents_observed_90d:
+    - {date: '2026-06-11', duration: 37 minutes, kind: Downtime}
+    - {date: '2026-07-07', duration: 8 minutes, kind: Downtime}
+    - {date: '2026-08-06', duration: 3 minutes, kind: Downtime}
+  coverage_gap: >-
+    NEITHER API HOST IS ON THE STATUS PAGE. The two monitored entries are the marketing site and
+    the web application. api.runalphaloops.com and mcp-freight.runalphaloops.com — the two hosts a
+    programmatic customer actually depends on, one of which carries a 99.9% SLA on paid tiers — are
+    not monitored or reported. A customer cannot tell from the status page whether the API is up.
+
+sla:
+  published: true
+  uptime_target: 99.9%
+  applies_to: MCP Pro tier and above
+  source: https://runalphaloops.com/mcp
+  rest_sla: none published
+  credits_or_remedies: none published
+  note: 99.9% is asserted as a tier inclusion; no measurement definition or service-credit schedule is published.
+
+support:
+  url: https://runalphaloops.com/support
+  http_status: 200
+  contact: https://runalphaloops.com/contact
+  email: hello@runalphaloop.com
+  email_domain_anomaly: >-
+    Published on the singular domain runalphaloop.com while all hosts are runalphaloops.com — see
+    security/alphaloops-vulnerability-disclosure.yml.
+
+changelog:
+  url: https://runalphaloops.com/whats-new
+  http_status: 200
+  dated: true
+  cross_ref: changelog/alphaloops-changelog.yml
+
+event_surface:
+  webhooks_advertised: true
+  webhooks_documented: false
+  asyncapi: false
+  note: >-
+    "Webhooks" is sold as a plan inclusion on both the pricing page (Enterprise) and the MCP page
+    (Pro) and the HubSpot integration note mentions "webhook support", but NO webhook
+    documentation exists on the public site — no event catalog, no payload schemas, no signing or
+    retry semantics, no subscription endpoint in the OpenAPI, and no AsyncAPI. This repo therefore
+    carries no asyncapi/ artifact and no Webhooks pointer: the surface is sold but not specified.
+    The closest published thing is the read-only change feed
+    GET /v1/carriers/{dot_number}/timeline, which returns detected change events with
+    event_type, field_name, old_value, new_value and source — a polling substitute for the
+    webhooks that are not documented.
+
+lifecycle_summary:
+  contract_stability: >-
+    Stable-looking: v1 path, info.version 1.0.0, no deprecated operations, an additive-change
+    commitment on the agent surface.
+  weakest_link: >-
+    Operational transparency. A 90-day deprecation window and a 99.9% SLA are published, but the
+    status page does not monitor either API host, no Sunset/Deprecation headers are emitted, and
+    the changelog has not carried an entry since 2026-05-19.
+
+evidence:
+  - url: https://runalphaloops.com/mcp
+    http_status: 200
+    note: Versioning + deprecation window + SLA.
+  - url: https://status.runalphaloops.com
+    http_status: 200
+    note: Uptime history, monitored service list, incident record.
+  - url: https://runalphaloops.com/fmcsa-api/docs
+    http_status: 200
+  - url: https://runalphaloops.com/support
+    http_status: 200

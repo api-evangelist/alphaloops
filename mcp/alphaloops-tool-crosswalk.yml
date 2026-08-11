@@ -1,0 +1,247 @@
+generated: '2026-08-11'
+method: derived
+source: >-
+  Derived by binding the MCP tool inventory published at https://runalphaloops.com/mcp to the
+  operationIds in the live OpenAPI 3.1 at https://runalphaloops.com/openapi.json
+  (saved at openapi/alphaloops-fmcsa-carrier-data-api-openapi.json, 25 operations, 53 schemas).
+purpose: >-
+  Give each MCP tool a real inputSchema. The live tools/list is auth-gated (401), so no tool
+  parameters are published anywhere. Where a tool binds to a REST operation, that operation's
+  parameters and requestBody ARE the tool's contract — an agent developer can read the real shape
+  out of the OpenAPI today without a key. Where a tool has no REST backing, that is stated, not
+  guessed.
+
+surfaces:
+  rest_openapi:
+    path: openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
+    url: https://runalphaloops.com/openapi.json
+    http_status: 200
+    gated: false
+    operations: 25
+  mcp:
+    url: https://mcp-freight.runalphaloops.com/mcp
+    http_status: 401
+    gated: true
+    note: tools/list requires a Bearer API key; tool names taken from the provider MCP page.
+  graphql:
+    present: false
+
+# Confidence policy for this file: `high` means the tool name and the operation describe the same
+# resource and action unambiguously (carrier_lookup -> getCarrierByDot). `medium` means the mapping
+# is semantically clear but the tool may compose or reshape the operation. Nothing is `high` on the
+# basis of name similarity alone where the REST surface has more than one plausible target.
+crosswalk:
+  # --- Lookup ---
+  - tool: carrier_lookup
+    category: Lookup
+    rest: [getCarrierByDot]
+    binding: rest
+    confidence: high
+    note: Inherits dot_number path param and the ?fields= projection param.
+  - tool: carrier_lookup_by_mc
+    category: Lookup
+    rest: [getCarrierByMc]
+    binding: rest
+    confidence: high
+  - tool: carrier_overview
+    category: Lookup
+    rest: [getCarrierOverview]
+    binding: rest
+    confidence: high
+  - tool: carrier_authority
+    category: Lookup
+    rest: [getCarrierAuthority]
+    binding: rest
+    confidence: high
+    note: >-
+      Page copy for this category also promises "BMC-91 filings", which in REST is
+      getCarrierInsurance / getCarrierInsuranceByMc — those are mapped as rest_only below, so the
+      tool likely composes authority + insurance. Not asserted as a binding without evidence.
+
+  # --- Search ---
+  - tool: carrier_search
+    category: Search
+    rest: [searchCarriers]
+    binding: rest
+    confidence: high
+    note: Fuzzy name match; inherits company_name/domain/state/city/page/limit.
+  - tool: carrier_filtered_query
+    category: Search
+    rest: [queryCarriers]
+    binding: rest
+    confidence: high
+    note: >-
+      POST /v1/carriers/query — the richest input in the API (include/exclude objects, geo-radius,
+      sort_by/sort_order, field projection). This is the one tool whose inputSchema genuinely needs
+      the OpenAPI requestBody to be usable.
+  - tool: carrier_similar
+    category: Search
+    rest: [getSimilarCarriers]
+    binding: rest
+    confidence: high
+  - tool: list_prospects
+    category: Search
+    rest: []
+    binding: none
+    confidence: low
+    note: See mcp_only — saved-list surface, no public REST equivalent.
+
+  # --- Safety ---
+  - tool: inspections_list
+    category: Safety
+    rest: [getCarrierInspections]
+    binding: rest
+    confidence: high
+  - tool: inspection_violations
+    category: Safety
+    rest: [getInspectionViolations]
+    binding: rest
+    confidence: high
+  - tool: crashes_list
+    category: Safety
+    rest: [getCarrierCrashes]
+    binding: rest
+    confidence: high
+  - tool: fleet_trucks
+    category: Safety
+    rest: [getCarrierTrucks]
+    binding: rest
+    confidence: high
+  - tool: fleet_trailers
+    category: Safety
+    rest: [getCarrierTrailers]
+    binding: rest
+    confidence: high
+
+  # --- Risk ---
+  - tool: carrier_risk_signals
+    category: Risk
+    rest: [getCarrierRiskSignals]
+    binding: rest
+    confidence: high
+  - tool: carrier_connections
+    category: Risk
+    rest: [getCarrierConnections]
+    binding: rest
+    confidence: high
+    note: Corporate-connection graph; REST returns ConnectionNode/ConnectionEdge.
+  - tool: watchlist_mc_sales
+    category: Risk
+    rest: [getCarrierMcSales]
+    binding: rest
+    confidence: medium
+    note: >-
+      REST getCarrierMcSales is per-carrier (dot_number path param); the tool name reads as a
+      watchlist query. Same data, possibly a different cardinality.
+  - tool: watchlist_subscribe
+    category: Risk
+    rest: []
+    binding: none
+    confidence: low
+  - tool: carrier_news
+    category: Risk
+    rest: [getCarrierNews]
+    binding: rest
+    confidence: high
+
+  # --- Contact ---
+  - tool: contacts_search
+    category: Contact
+    rest: [searchContacts]
+    binding: rest
+    confidence: high
+    note: >-
+      REST can answer 202 Accepted here (contacts fetched asynchronously, retry after delay) —
+      an agent calling this tool must handle a deferred result, which no MCP-side documentation
+      mentions.
+  - tool: contact_enrich
+    category: Contact
+    rest: [enrichContact]
+    binding: rest
+    confidence: high
+    note: >-
+      Consumes 1 credit per new enrichment; 402 when exhausted. Cached results are free.
+      Credit balance returns in the body and in X-Enrichment-Credits-Remaining.
+  - tool: contacts_enrich_bulk
+    category: Contact
+    rest: []
+    binding: none
+    confidence: low
+
+  # --- Score ---
+  - tool: carrier_score
+    category: Score
+    rest: []
+    binding: none
+    confidence: low
+  - tool: list_create
+    category: Score
+    rest: []
+    binding: none
+    confidence: low
+  - tool: list_enrich
+    category: Score
+    rest: []
+    binding: none
+    confidence: low
+
+# Tools with no public REST operation behind them. These are the platform's list-management and
+# scoring surface — the part of AlphaLoops that is NOT in the published API contract at all.
+# An agent can invoke them; a REST integrator cannot reach them.
+mcp_only:
+  - tool: carrier_score
+    reason: >-
+      ICP/risk/displacement scoring. No scoring operation exists in the OpenAPI. The changelog
+      describes this capability (AI-Powered Account Ranking, CarrierMatch, carrier embeddings) as
+      an app feature, never as a REST endpoint.
+  - tool: list_create
+    reason: Saved-list creation. No /lists resource in the OpenAPI.
+  - tool: list_enrich
+    reason: Bulk enrichment of a saved list. No list resource, no bulk-enrich operation in REST.
+  - tool: list_prospects
+    reason: Saved-list retrieval. No list resource in the OpenAPI.
+  - tool: watchlist_subscribe
+    reason: >-
+      Creates a monitoring subscription. Nothing in the OpenAPI writes state — the entire REST
+      surface is read-only apart from two POST search operations.
+  - tool: contacts_enrich_bulk
+    reason: >-
+      Bulk variant of enrichContact. REST exposes only the single-contact enrichment path
+      /v1/contacts/{contact_id}/enrich.
+
+# REST operations with no named MCP tool. Six of these are substantive data families the agent
+# surface simply does not reach, which is the mirror image of the gap above.
+rest_only:
+  - operationId: getCarrierInsurance
+    path: GET /v1/carriers/{dot_number}/insurance
+    note: Insurance/BMC-91 filing history. No named tool, though the Lookup category advertises BMC-91.
+  - operationId: getCarrierInsuranceByMc
+    path: GET /v1/carriers/mc/{mc_number}/insurance
+  - operationId: getCarrierTimeline
+    path: GET /v1/carriers/{dot_number}/timeline
+    note: Change-event feed with category counts — the closest thing the API has to an event surface.
+  - operationId: getCarrierEquipmentForSale
+    path: GET /v1/carriers/{dot_number}/equipment-for-sale
+    note: Risk category advertises "equipment sale signals" but names no tool for it.
+  - operationId: getVinInspectionHistory
+    path: GET /v1/inspections/vin/{vin}
+  - operationId: lookupVins
+    path: GET /v1/vins
+  - operationId: lookupVinsBatch
+    path: POST /v1/vins
+    note: VIN-level lookup is marketed heavily ("profiled to the VIN") but has no MCP tool.
+
+coverage:
+  mcp_tools_named: 24
+  mcp_tools_advertised: '30+'
+  rest_operations: 25
+  bound: 18
+  mcp_only: 6
+  rest_only: 7
+  bound_pct_of_named_tools: 75.0
+  bound_pct_of_rest_operations: 72.0
+  note: >-
+    Neither surface is a superset. 18 of 24 named tools have a REST contract an agent developer can
+    read today; 7 of 25 REST operations have no agent tool. The two surfaces diverge exactly along
+    the read/write line — REST is read-only, and every unbound tool either writes state (lists,
+    watchlist subscriptions) or runs the proprietary scoring model.

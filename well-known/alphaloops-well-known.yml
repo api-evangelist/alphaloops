@@ -1,0 +1,95 @@
+generated: '2026-08-11'
+method: probed
+source: live probes of every AlphaLoops host, 2026-08-11
+description: >-
+  Probe of the standard /.well-known/ surface across all three AlphaLoops hosts. ONE real document
+  was served: an RFC 8414 OAuth 2.0 Authorization Server Metadata document on the MCP host, saved
+  verbatim as alphaloops-oauth-authorization-server.json. Everything else missed.
+
+# READ THIS BEFORE TRUSTING ANY 200 ON runalphaloops.com — the marketing site is a single-page
+# app with a catch-all route. It answers HTTP 200 with the SAME 6,831-byte HTML shell for EVERY
+# path under /.well-known/, and for /llms.txt and /apis.json as well. A 200 there is not a
+# document; it is the homepage wearing the requested filename. Every runalphaloops.com row below
+# is recorded as a MISS despite its 200 status, and the byte-identical size is the proof.
+soft_404_signature:
+  host: runalphaloops.com
+  http_status: 200
+  content_type: text/html; charset=utf-8
+  bytes: 6831
+  note: Identical response body on every probed path; treat as 404.
+
+hits:
+  - host: mcp-freight.runalphaloops.com
+    path: /.well-known/oauth-authorization-server
+    url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
+    http_status: 200
+    content_type: application/json
+    bytes: 459
+    file: alphaloops-oauth-authorization-server.json
+    spec: RFC 8414 (OAuth 2.0 Authorization Server Metadata)
+    parses_as_json: true
+    summary:
+      issuer: https://mcp-freight.runalphaloops.com
+      authorization_endpoint: https://mcp-freight.runalphaloops.com/authorize
+      token_endpoint: https://mcp-freight.runalphaloops.com/token
+      registration_endpoint: https://mcp-freight.runalphaloops.com/oauth/register
+      grant_types_supported: [authorization_code, refresh_token]
+      response_types_supported: [code]
+      token_endpoint_auth_methods_supported: [none]
+      code_challenge_methods_supported: [S256]
+    note: >-
+      Public client profile — PKCE S256 required, no client secret, and Dynamic Client Registration
+      (RFC 7591) is open at /oauth/register. This is the MCP authorization pattern. Note the
+      document declares NO scopes_supported, so no OAuth scope vocabulary can be derived from it;
+      that is why this repo carries no scopes/ artifact.
+
+misses:
+  - host: runalphaloops.com
+    results:
+      - {path: /.well-known/security.txt, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/openid-configuration, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/oauth-authorization-server, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/oauth-protected-resource, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/api-catalog, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/ai-plugin.json, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/agent-card.json, http_status: 200, result: miss, reason: spa-shell}
+      - {path: /.well-known/agent.json, http_status: 200, result: miss, reason: spa-shell}
+  - host: api.runalphaloops.com
+    results:
+      - {path: /.well-known/security.txt, http_status: 404, result: miss}
+      - {path: /.well-known/openid-configuration, http_status: 404, result: miss}
+      - {path: /.well-known/oauth-authorization-server, http_status: 404, result: miss}
+      - {path: /.well-known/oauth-protected-resource, http_status: 404, result: miss}
+      - {path: /.well-known/api-catalog, http_status: 404, result: miss}
+      - {path: /.well-known/ai-plugin.json, http_status: 404, result: miss}
+      - {path: /.well-known/agent-card.json, http_status: 404, result: miss}
+      - {path: /.well-known/agent.json, http_status: 404, result: miss}
+  - host: mcp-freight.runalphaloops.com
+    results:
+      - {path: /.well-known/security.txt, http_status: 404, result: miss}
+      - {path: /.well-known/openid-configuration, http_status: 404, result: miss}
+      - {path: /.well-known/oauth-protected-resource, http_status: 404, result: miss}
+      - {path: /.well-known/api-catalog, http_status: 404, result: miss}
+      - {path: /.well-known/ai-plugin.json, http_status: 404, result: miss}
+      - {path: /.well-known/agent-card.json, http_status: 404, result: miss}
+      - {path: /.well-known/agent.json, http_status: 404, result: miss}
+
+# Gaps worth naming to the provider, in priority order.
+gaps:
+  - id: oauth-protected-resource
+    detail: >-
+      The MCP host publishes the authorization-server half of the pair but not
+      /.well-known/oauth-protected-resource (RFC 9728), which is the document an MCP client uses to
+      discover WHICH authorization server protects the resource. The 401 on /mcp does carry a
+      WWW-Authenticate header with authorization_uri, so discovery is possible — but via a
+      non-standard hint rather than the standard document.
+    severity: medium
+  - id: no-security-txt
+    detail: >-
+      RFC 9116 security.txt is served on no host, even though a disclosure address and a 24-hour
+      response commitment are published in prose at /security.
+    severity: medium
+  - id: no-api-catalog
+    detail: >-
+      No RFC 9727 /.well-known/api-catalog, and the advertised /apis.json returns the SPA shell.
+    severity: low
