@@ -1,14 +1,23 @@
 accessModel:
-  pricing: unknown
-  onboarding: unknown
-  trial: false
+  pricing: paid
+  onboarding: sales
+  trial: true
   try_now: false
-  public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
+  public: true
+  label: Paid — sales-gated API key
+  confidence: high
+  source:
+    - https://runalphaloops.com/pricing
+    - https://runalphaloops.com/mcp
+    - https://runalphaloops.com/fmcsa-api/docs
+  generated: '2026-08-11'
+  method: searched
+  note: >-
+    Documentation, the OpenAPI and the MCP reference are all public and unauthenticated. Keys are
+    not self-service — both the REST docs and the MCP page route "Get an API key" to a sales
+    contact form. Platform tiers publish named prices ($1,200 / $2,520 / $4,000 per month) with a
+    14-day trial on the lower two; the MCP page publishes a separate ladder starting at $0. The two
+    ladders disagree about what API access costs — recorded in plans/alphaloops-plans-pricing.yml.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/alphaloops.png
 name: AlphaLoops FMCSA Carrier Data API
 description: >-
@@ -18,7 +27,7 @@ description: >-
   published Python/TypeScript SDKs plus a CLI.
 url: https://alphaloops-fmcsa-carrier-data-api.apievangelist.com/apis.yml
 created: '2026-07-07'
-modified: '2026-07-07'
+modified: '2026-08-11'
 specificationVersion: '0.21'
 tags:
   - fmcsa api
@@ -53,22 +62,71 @@ apis:
       - motor carrier
       - fleet intelligence
       - sales intelligence
-      - mcp server
       - contact enrichment
       - risk
       - fraud
     properties:
       - type: OpenAPI
+        url: openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
+      - type: OpenAPI
         url: https://runalphaloops.com/openapi.json
+      - type: Overlay
+        url: overlays/alphaloops-fmcsa-carrier-data-api-overlay.yaml
       - type: Documentation
         url: https://runalphaloops.com/fmcsa-api/docs
       - type: Documentation
         url: https://runalphaloops.com/fmcsa-api/guide
+      - type: APIReference
+        url: https://runalphaloops.com/fmcsa-api/docs
+      - type: DeveloperPortal
+        url: https://runalphaloops.com/fmcsa-api
+      - type: ErrorCatalog
+        url: errors/alphaloops-problem-types.yml
+      - type: DataModel
+        url: data-model/alphaloops-data-model.yml
+      - type: RateLimits
+        url: rate-limits/alphaloops-rate-limits.yml
+      - type: Plans
+        url: plans/alphaloops-plans-pricing.yml
       - type: MCPServer
         url: https://mcp-freight.runalphaloops.com/mcp
+  - name: AlphaLoops MCP Server
+    description: >-
+      Hosted remote Model Context Protocol server exposing 2.7M U.S. motor carriers as tools for LLM clients
+      (Claude Desktop/Code, Cursor, Windsurf, VS Code Copilot, Clay). Advertises 30+ tools across six categories —
+      lookup, search, scoring, safety, risk and contacts — of which 24 are named publicly. Bearer-token auth over
+      MCP URL transport (HTTPS + SSE); tool schemas are header-pinned via X-AlphaLoops-Version. An unauthenticated
+      tools/list returns 401, so live tool schemas are gated.
+    humanURL: https://runalphaloops.com/mcp
+    baseURL: https://mcp-freight.runalphaloops.com
+    tags:
+      - mcp server
+      - carrier data
+      - freight
+      - fleet intelligence
+      - agent tools
+      - risk
+    properties:
+      - type: MCPServer
+        url: https://mcp-freight.runalphaloops.com/mcp
+      - type: MCP
+        url: mcp/alphaloops-mcp.yml
+      - type: ToolCrosswalk
+        url: mcp/alphaloops-tool-crosswalk.yml
+      - type: Documentation
+        url: https://runalphaloops.com/mcp
+      - type: Quickstart
+        url: https://runalphaloops.com/mcp
+      - type: WellKnown
+        url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
 maintainers:
   - FN: AlphaLoops
     url: https://runalphaloops.com
+    email: hello@runalphaloop.com
+    note: >-
+      Email exactly as the provider publishes it. Note the domain is runalphaloop.com (singular)
+      while every operational host is runalphaloops.com (plural) — see
+      security/alphaloops-vulnerability-disclosure.yml.
 generated:
   by: apis.io/add
   model: claude-opus-4-8
@@ -79,7 +137,62 @@ common:
   url: security/alphaloops-trust-center.yml
 - type: VulnerabilityDisclosure
   url: security/alphaloops-vulnerability-disclosure.yml
+- type: Security
+  url: security/alphaloops-vulnerability-disclosure.yml
+- type: Compliance
+  url: security/alphaloops-trust-center.yml
 - type: DomainSecurity
   url: security/alphaloops-domain-security.yml
 - type: Authentication
   url: authentication/alphaloops-authentication.yml
+- type: Packages
+  url: packages/alphaloops-packages.yml
+- type: SDKs
+  url: packages/alphaloops-packages.yml
+- type: CLI
+  url: cli/alphaloops-cli.yml
+- type: WellKnown
+  url: well-known/alphaloops-well-known.yml
+- type: MCPServer
+  url: mcp/alphaloops-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/alphaloops-tool-crosswalk.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: LLMsTxt
+  url: llms/alphaloops-llms.txt
+- type: Conformance
+  url: conformance/alphaloops-conformance.yml
+- type: Conventions
+  url: conventions/alphaloops-conventions.yml
+- type: Lifecycle
+  url: lifecycle/alphaloops-lifecycle.yml
+- type: StatusPage
+  url: lifecycle/alphaloops-lifecycle.yml
+- type: StatusPage
+  url: https://status.runalphaloops.com
+- type: Deprecation
+  url: lifecycle/alphaloops-lifecycle.yml
+- type: ChangeLog
+  url: changelog/alphaloops-changelog.yml
+- type: ChangeLog
+  url: https://runalphaloops.com/whats-new
+- type: Pricing
+  url: https://runalphaloops.com/pricing
+- type: Support
+  url: https://runalphaloops.com/support
+- type: GitHubOrganization
+  url: https://github.com/RunAlphaLoop
+- type: Login
+  url: https://alphafreight.runalphaloops.com/login
+- type: TermsOfService
+  url: https://runalphaloops.com/terms
+- type: PrivacyPolicy
+  url: https://runalphaloops.com/privacy
+- type: Integrations
+  url: https://runalphaloops.com/integrations
+x-enrichment:
+  date: '2026-08-11'
+  status: enriched
+  artifacts_added: 26
+  pass: local-v1
