@@ -1,0 +1,227 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Inspections API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Inspections
+paths:
+  /v1/inspections/{inspection_id}/violations:
+    get:
+      operationId: getInspectionViolations
+      summary: Get violations for a specific inspection
+      description: Retrieve all violations from a specific roadside inspection. Use the inspection report number returned from the Inspections endpoint.
+      parameters:
+      - name: inspection_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The inspection report number
+      - $ref: '#/components/parameters/page'
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+        description: 'Results per page (default: 25, max: 100)'
+      responses:
+        '200':
+          description: Paginated violation records
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ViolationsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Inspections
+  /v1/inspections/vin/{vin}:
+    get:
+      operationId: getVinInspectionHistory
+      summary: Get inspection history for a VIN
+      description: Look up the inspection history for a VIN. Returns the unique DOT numbers the VIN has been associated with (with last date seen on each), plus the unique FIPS-coded county locations where the VIN has been inspected. Capped at the 5,000 most-recent inspections; successful responses are edge-cached for 24h.
+      parameters:
+      - name: vin
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Vehicle Identification Number (case-insensitive — normalized to uppercase server-side)
+      responses:
+        '200':
+          description: VIN inspection history aggregated by DOT and location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinInspectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Inspections
+components:
+  schemas:
+    Violation:
+      type: object
+      properties:
+        violation_code:
+          type: string
+        description:
+          type: string
+        oos:
+          type: boolean
+        unit_type:
+          type: string
+        basic_category:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    ViolationsResponse:
+      type: object
+      properties:
+        inspection_id:
+          type: string
+        total_violations:
+          type: integer
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Violation'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    VinInspectionResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+        inspection_count:
+          type: integer
+        sample_size:
+          type: integer
+        truncated:
+          type: boolean
+          description: True when capped at 5,000 inspections; aggregations are over the returned sample.
+        dot_numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinDotAssociation'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinLocation'
+    VinLocation:
+      type: object
+      properties:
+        fips:
+          type: string
+        state_fips:
+          type: string
+        county_fips:
+          type: string
+        county_name:
+          type: string
+        state_abbrev:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        last_seen:
+          type: string
+          format: date
+        inspection_count:
+          type: integer
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    VinDotAssociation:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        last_seen:
+          type: string
+          format: date
+        inspection_count:
+          type: integer
+  responses:
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: 'Page number (default: 1)'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'

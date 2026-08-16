@@ -1,0 +1,190 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Vins API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Vins
+paths:
+  /v1/vins:
+    get:
+      operationId: lookupVins
+      summary: Look up one or more VINs
+      description: 'For each VIN, returns its FMCSA inspection-unit history, most recent sighting, every DOT it has been associated with, and whether it has ever been listed for sale. Accepts a single VIN or a comma-separated list via query params. Max 100 VINs per request; results preserve input order and include misses (found: false).'
+      parameters:
+      - name: vin
+        in: query
+        required: false
+        schema:
+          type: string
+        description: A single VIN to look up (e.g. ?vin=3AKJHHDR3RSUV5213). Case-insensitive.
+      - name: vins
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Comma-separated list of VINs (e.g. ?vins=VIN1,VIN2,VIN3). Max 100.
+      responses:
+        '200':
+          description: Per-VIN lookup results in input order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Vins
+    post:
+      operationId: lookupVinsBatch
+      summary: Batch look up VINs
+      description: 'Batch form of the VIN lookup. Send a JSON array of VINs in the request body. Max 100 VINs per request; results preserve input order and include misses (found: false).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                vins:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of VINs to look up (max 100)
+              required:
+              - vins
+      responses:
+        '200':
+          description: Per-VIN lookup results in input order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VinsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Vins
+components:
+  schemas:
+    VinResult:
+      type: object
+      properties:
+        vin:
+          type: string
+        found:
+          type: boolean
+        inspection_count:
+          type: integer
+        most_recent:
+          type: object
+          nullable: true
+          properties:
+            date:
+              type: string
+              format: date
+            time:
+              type: string
+            location:
+              type: string
+            state:
+              type: string
+            dot_number:
+              type: string
+            inspection_id:
+              type: integer
+        dots_associated:
+          type: array
+          items:
+            type: string
+        inspections:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        for_sale:
+          type: object
+          properties:
+            listed:
+              type: boolean
+            as_truck:
+              type: object
+              nullable: true
+              additionalProperties: true
+            as_trailer:
+              type: object
+              nullable: true
+              additionalProperties: true
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    VinsResponse:
+      type: object
+      properties:
+        requested:
+          type: integer
+          description: Unique VIN count after normalization
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinResult'
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'

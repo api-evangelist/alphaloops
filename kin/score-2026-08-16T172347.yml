@@ -1,0 +1,42 @@
+# Kin Score artifact — alphaloops-fmcsa-carrier-data-api — 2026-08-16T172347
+# The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
+---
+kin_score:
+  slug: alphaloops-fmcsa-carrier-data-api
+  schema_version: 0.11.0
+  scored_at: '2026-08-16'
+  run_ts: 2026-08-16T172347
+  composite: 61.8
+  band: strong
+  facets:
+    discoverability: 81.5
+    contract_quality: 59.3
+    governance: 20.8
+    operational_transparency: 86.8
+    developer_ergonomics: 43.5
+    commercial_clarity: 92.1
+  agent_readiness:
+    score: 50.0
+    band: agent-ready
+    band_gated_from: agent-native
+    dimensions:
+      spec_presence: true
+      agentic_access: false
+      mcp_server: true
+      auth_clarity: true
+      idempotency: false
+      error_semantics: false
+      openapi_examples: partial
+      rate_limit_signal: verified
+      event_surface_described: false
+      agent_skills: true
+      well_known_catalog: false
+      consent_identity: false
+      agent_card: false
+      dry_run_mode: false
+  regulatory:
+    applies: true
+    regime: Telecommunications
+    regime_id: telecommunications
+    score: 50.0
+    matched_via: tags

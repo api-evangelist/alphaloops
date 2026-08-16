@@ -44,81 +44,140 @@ tags:
   - risk
   - fraud
 apis:
-  - name: AlphaLoops FMCSA Carrier Data API
-    description: >-
-      REST API for FMCSA carrier data: lookup by DOT/MC/name, 200+-field profiles, authority & insurance history,
-      VIN-level fleet, roadside inspections & violations, crashes, news, corporate-connection graph, similar carriers,
-      contact search & enrichment, MC-authority and equipment-for-sale signals, and watchlists. Bearer-token auth;
-      endpoints under /v1/.
-    humanURL: https://runalphaloops.com/fmcsa-api/docs
-    baseURL: https://api.runalphaloops.com
-    tags:
-      - fmcsa api
-      - safer web api
-      - dot lookup
-      - carrier data
-      - freight
-      - trucking
-      - motor carrier
-      - fleet intelligence
-      - sales intelligence
-      - contact enrichment
-      - risk
-      - fraud
-    properties:
-      - type: OpenAPI
-        url: openapi/alphaloops-fmcsa-carrier-data-api-openapi.json
-      - type: OpenAPI
-        url: https://runalphaloops.com/openapi.json
-      - type: Overlay
-        url: overlays/alphaloops-fmcsa-carrier-data-api-overlay.yaml
-      - type: Documentation
-        url: https://runalphaloops.com/fmcsa-api/docs
-      - type: Documentation
-        url: https://runalphaloops.com/fmcsa-api/guide
-      - type: APIReference
-        url: https://runalphaloops.com/fmcsa-api/docs
-      - type: DeveloperPortal
-        url: https://runalphaloops.com/fmcsa-api
-      - type: ErrorCatalog
-        url: errors/alphaloops-problem-types.yml
-      - type: DataModel
-        url: data-model/alphaloops-data-model.yml
-      - type: RateLimits
-        url: rate-limits/alphaloops-rate-limits.yml
-      - type: Plans
-        url: plans/alphaloops-plans-pricing.yml
-      - type: MCPServer
-        url: https://mcp-freight.runalphaloops.com/mcp
-  - name: AlphaLoops MCP Server
-    description: >-
-      Hosted remote Model Context Protocol server exposing 2.7M U.S. motor carriers as tools for LLM clients
-      (Claude Desktop/Code, Cursor, Windsurf, VS Code Copilot, Clay). Advertises 30+ tools across six categories —
-      lookup, search, scoring, safety, risk and contacts — of which 24 are named publicly. Bearer-token auth over
-      MCP URL transport (HTTPS + SSE); tool schemas are header-pinned via X-AlphaLoops-Version. An unauthenticated
-      tools/list returns 401, so live tool schemas are gated.
-    humanURL: https://runalphaloops.com/mcp
-    baseURL: https://mcp-freight.runalphaloops.com
-    tags:
-      - mcp server
-      - carrier data
-      - freight
-      - fleet intelligence
-      - agent tools
-      - risk
-    properties:
-      - type: MCPServer
-        url: https://mcp-freight.runalphaloops.com/mcp
-      - type: MCP
-        url: mcp/alphaloops-mcp.yml
-      - type: ToolCrosswalk
-        url: mcp/alphaloops-tool-crosswalk.yml
-      - type: Documentation
-        url: https://runalphaloops.com/mcp
-      - type: Quickstart
-        url: https://runalphaloops.com/mcp
-      - type: WellKnown
-        url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
+- name: AlphaLoops MCP Server
+  description: >-
+    Hosted remote Model Context Protocol server exposing 2.7M U.S. motor carriers as tools for LLM clients
+    (Claude Desktop/Code, Cursor, Windsurf, VS Code Copilot, Clay). Advertises 30+ tools across six categories
+    — lookup, search, scoring, safety, risk and contacts — of which 24 are named publicly. Bearer-token
+    auth over MCP URL transport (HTTPS + SSE); tool schemas are header-pinned via X-AlphaLoops-Version.
+    An unauthenticated tools/list returns 401, so live tool schemas are gated.
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
+  tags:
+  - mcp server
+  - carrier data
+  - freight
+  - fleet intelligence
+  - agent tools
+  - risk
+  properties:
+  - type: MCPServer
+    url: https://mcp-freight.runalphaloops.com/mcp
+  - type: MCP
+    url: mcp/alphaloops-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/alphaloops-tool-crosswalk.yml
+  - type: Documentation
+    url: https://runalphaloops.com/mcp
+  - type: Quickstart
+    url: https://runalphaloops.com/mcp
+  - type: WellKnown
+    url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
+- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-carriers-api
+  name: AlphaLoops FMCSA Carrier Data API Carriers API
+  description: The Carriers API from AlphaLoops FMCSA Carrier Data API — 19 operation(s) for carriers.
+  humanURL: https://runalphaloops.com/fmcsa-api/docs
+  baseURL: https://api.runalphaloops.com
+  tags:
+  - Carriers
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-fmcsa-carrier-data-api-carriers-api-openapi.yml
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/guide
+  - type: APIReference
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: DeveloperPortal
+    url: https://runalphaloops.com/fmcsa-api
+  - type: ErrorCatalog
+    url: errors/alphaloops-problem-types.yml
+  - type: DataModel
+    url: data-model/alphaloops-data-model.yml
+  - type: RateLimits
+    url: rate-limits/alphaloops-rate-limits.yml
+  - type: Plans
+    url: plans/alphaloops-plans-pricing.yml
+- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-contacts-api
+  name: AlphaLoops FMCSA Carrier Data API Contacts API
+  description: The Contacts API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for contacts.
+  humanURL: https://runalphaloops.com/fmcsa-api/docs
+  baseURL: https://api.runalphaloops.com
+  tags:
+  - Contacts
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-fmcsa-carrier-data-api-contacts-api-openapi.yml
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/guide
+  - type: APIReference
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: DeveloperPortal
+    url: https://runalphaloops.com/fmcsa-api
+  - type: ErrorCatalog
+    url: errors/alphaloops-problem-types.yml
+  - type: DataModel
+    url: data-model/alphaloops-data-model.yml
+  - type: RateLimits
+    url: rate-limits/alphaloops-rate-limits.yml
+  - type: Plans
+    url: plans/alphaloops-plans-pricing.yml
+- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-inspections-api
+  name: AlphaLoops FMCSA Carrier Data API Inspections API
+  description: >-
+    The Inspections API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for inspections.
+  humanURL: https://runalphaloops.com/fmcsa-api/docs
+  baseURL: https://api.runalphaloops.com
+  tags:
+  - Inspections
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-fmcsa-carrier-data-api-inspections-api-openapi.yml
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/guide
+  - type: APIReference
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: DeveloperPortal
+    url: https://runalphaloops.com/fmcsa-api
+  - type: ErrorCatalog
+    url: errors/alphaloops-problem-types.yml
+  - type: DataModel
+    url: data-model/alphaloops-data-model.yml
+  - type: RateLimits
+    url: rate-limits/alphaloops-rate-limits.yml
+  - type: Plans
+    url: plans/alphaloops-plans-pricing.yml
+- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-vins-api
+  name: AlphaLoops FMCSA Carrier Data API Vins API
+  description: The Vins API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for vins.
+  humanURL: https://runalphaloops.com/fmcsa-api/docs
+  baseURL: https://api.runalphaloops.com
+  tags:
+  - Vins
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-fmcsa-carrier-data-api-vins-api-openapi.yml
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: Documentation
+    url: https://runalphaloops.com/fmcsa-api/guide
+  - type: APIReference
+    url: https://runalphaloops.com/fmcsa-api/docs
+  - type: DeveloperPortal
+    url: https://runalphaloops.com/fmcsa-api
+  - type: ErrorCatalog
+    url: errors/alphaloops-problem-types.yml
+  - type: DataModel
+    url: data-model/alphaloops-data-model.yml
+  - type: RateLimits
+    url: rate-limits/alphaloops-rate-limits.yml
+  - type: Plans
+    url: plans/alphaloops-plans-pricing.yml
 maintainers:
   - FN: AlphaLoops
     url: https://runalphaloops.com
@@ -133,6 +192,8 @@ generated:
   confidence: 92
   at: '2026-07-07T13:54:21.644Z'
 common:
+- type: Overlay
+  url: overlays/alphaloops-fmcsa-carrier-data-api-overlay.yaml
 - type: TrustCenter
   url: security/alphaloops-trust-center.yml
 - type: VulnerabilityDisclosure

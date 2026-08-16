@@ -1,0 +1,51 @@
+{
+  "provider": "alphaloops-fmcsa-carrier-data-api",
+  "sources": [
+    "alphaloops-fmcsa-carrier-data-api-openapi.json"
+  ],
+  "outputs": [
+    "alphaloops-fmcsa-carrier-data-api-carriers-api-openapi.yml",
+    "alphaloops-fmcsa-carrier-data-api-contacts-api-openapi.yml",
+    "alphaloops-fmcsa-carrier-data-api-inspections-api-openapi.yml",
+    "alphaloops-fmcsa-carrier-data-api-vins-api-openapi.yml"
+  ],
+  "archived": [
+    "archived openapi/alphaloops-fmcsa-carrier-data-api-openapi.json"
+  ],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number} -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/mc/{mc_number} -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/search -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/authority -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/trucks -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/trailers -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/inspections -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/inspections/{inspection_id}/violations -> Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/crashes -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/news -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/contacts/search -> Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/contacts/{contact_id}/enrich -> Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths POST /v1/carriers/query -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/insurance -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/mc/{mc_number}/insurance -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/timeline -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/mc-sales -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/equipment-for-sale -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/connections -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/risk-signals -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/similar -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/overview -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/inspections/vin/{vin} -> Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/vins -> Vins",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths POST /v1/vins -> Vins",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Vins",
+    "apis.yml register: written (+4 apis, 5 total)"
+  ],
+  "skipped": []
+}

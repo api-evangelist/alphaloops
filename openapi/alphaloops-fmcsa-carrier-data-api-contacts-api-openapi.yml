@@ -1,0 +1,370 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Contacts API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Contacts
+paths:
+  /v1/contacts/search:
+    get:
+      operationId: searchContacts
+      summary: Find people at a carrier company
+      description: 'Returns professional profiles including name, title, seniority, social profiles, and industry. Use dot_number or company_name to search. Note: This endpoint may return HTTP 202 with a Retry-After header if contacts are still being fetched — retry after the specified delay.'
+      parameters:
+      - name: dot_number
+        in: query
+        required: false
+        schema:
+          type: string
+        description: The carrier's USDOT number
+      - name: company_name
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Company name to search (required if dot_number not provided)
+      - name: job_title
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by job title keyword (e.g. "safety", "operations")
+      - name: job_title_levels
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - vp
+          - director
+          - manager
+          - c_suite
+        description: Filter by seniority level
+      - $ref: '#/components/parameters/page'
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+        description: 'Results per page (default: 25, max: 100)'
+      responses:
+        '200':
+          description: Paginated contact results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactSearchResponse'
+        '202':
+          description: Contacts are being fetched asynchronously. Retry after the delay specified in the Retry-After header.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Seconds to wait before retrying
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: pending
+                  dot_number:
+                    type: string
+                  message:
+                    type: string
+                  retry_after:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Contacts
+  /v1/contacts/{contact_id}/enrich:
+    get:
+      operationId: enrichContact
+      summary: Enrich a contact profile
+      description: Returns verified emails, phone numbers, skills, full work history, education, and social profiles. Consumes 1 enrichment credit per new lookup (cached results are free). Returns HTTP 402 when credits are exhausted.
+      parameters:
+      - name: contact_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The contact ID returned from /v1/contacts/search
+      responses:
+        '200':
+          description: Enriched contact profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrichedContact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          description: Enrichment credits exhausted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Contacts
+components:
+  responses:
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    EnrichedContact:
+      type: object
+      description: Enriched contact profile with verified emails, phone numbers, work history, education, and social profiles. Consumes 1 enrichment credit per new lookup.
+      properties:
+        id:
+          type: string
+        full_name:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        sex:
+          type: string
+        job_title:
+          type: string
+        job_title_role:
+          type: string
+        job_title_levels:
+          type: array
+          items:
+            type: string
+        job_company_name:
+          type: string
+        job_company_website:
+          type: string
+        job_company_size:
+          type: string
+        job_company_industry:
+          type: string
+        work_email:
+          type: string
+          format: email
+          nullable: true
+        personal_emails:
+          type: array
+          items:
+            type: string
+            format: email
+        mobile_phone:
+          type: string
+          nullable: true
+        phone_numbers:
+          type: array
+          items:
+            type: string
+        linkedin_url:
+          type: string
+        facebook_url:
+          type: string
+          nullable: true
+        location_name:
+          type: string
+        location_locality:
+          type: string
+        location_region:
+          type: string
+        location_country:
+          type: string
+        location_geo:
+          type: string
+          description: Lat,lng coordinates
+        skills:
+          type: array
+          items:
+            type: string
+        experience:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkExperience'
+        education:
+          type: array
+          items:
+            $ref: '#/components/schemas/Education'
+        profiles:
+          type: array
+          items:
+            type: object
+            properties:
+              network:
+                type: string
+              url:
+                type: string
+        credits:
+          type: object
+          properties:
+            remaining:
+              type: integer
+            total:
+              type: integer
+            used:
+              type: integer
+    ContactSearchResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_contacts:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    WorkExperience:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
+        is_primary:
+          type: boolean
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+        full_name:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        sex:
+          type: string
+        job_title:
+          type: string
+        job_title_role:
+          type: string
+        job_title_levels:
+          type: array
+          items:
+            type: string
+        job_company_name:
+          type: string
+        job_company_website:
+          type: string
+        job_company_size:
+          type: string
+        job_company_industry:
+          type: string
+        job_start_date:
+          type: string
+        industry:
+          type: string
+        linkedin_url:
+          type: string
+        facebook_url:
+          type: string
+          nullable: true
+        location_name:
+          type: string
+        location_region:
+          type: string
+        location_country:
+          type: string
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    Education:
+      type: object
+      properties:
+        school:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: 'Page number (default: 1)'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'
