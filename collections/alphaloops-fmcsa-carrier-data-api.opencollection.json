@@ -1,0 +1,837 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "AlphaLoops FMCSA Carrier Data API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Look up a carrier by DOT number",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "fields",
+            "value": "",
+            "type": "query",
+            "description": "Comma-separated list of fields to return (e.g. \"legal_name,power_units,latitude,longitude\"). Omit to return all fields."
+          }
+        ]
+      },
+      "docs": "Returns the full carrier profile with 200+ fields including identity, authority, safety, fleet, technology stack, and contacts. Use the fields parameter to project only the fields you need."
+    },
+    {
+      "info": {
+        "name": "Look up a carrier by MC/MX docket number",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/mc/:mc_number",
+        "params": [
+          {
+            "name": "mc_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's MC or MX docket number"
+          },
+          {
+            "name": "fields",
+            "value": "",
+            "type": "query",
+            "description": "Comma-separated list of fields to return. Omit to return all fields."
+          }
+        ]
+      },
+      "docs": "Returns the full carrier profile (same fields as the DOT lookup). Supports the same ?fields= projection parameter."
+    },
+    {
+      "info": {
+        "name": "Match a company to a carrier by name",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/search",
+        "params": [
+          {
+            "name": "company_name",
+            "value": "",
+            "type": "query",
+            "description": "Company name to match against (fuzzy matching)"
+          },
+          {
+            "name": "domain",
+            "value": "",
+            "type": "query",
+            "description": "Company website domain (e.g. \"swifttrans.com\") — improves match accuracy"
+          },
+          {
+            "name": "state",
+            "value": "",
+            "type": "query",
+            "description": "State abbreviation (e.g. \"TX\", \"CA\")"
+          },
+          {
+            "name": "city",
+            "value": "",
+            "type": "query",
+            "description": "City name (e.g. \"Phoenix\", \"Dallas\")"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 10, max: 50)"
+          }
+        ]
+      },
+      "docs": "Match a company to a carrier by name, domain, state, and city. Returns ranked results with a confidence score. At minimum, company_name is required."
+    },
+    {
+      "info": {
+        "name": "Get carrier operating authority history",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/authority",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50)"
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "type": "query",
+            "description": "Number of results to skip (default: 0)"
+          }
+        ]
+      },
+      "docs": "Returns all authority actions including grants, revocations, and reinstatements."
+    },
+    {
+      "info": {
+        "name": "Get carrier truck (power unit) fleet",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/trucks",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50, max: 200)"
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "type": "query",
+            "description": "Number of results to skip (default: 0)"
+          }
+        ]
+      },
+      "docs": "Returns the carrier's registered truck fleet. Includes VIN, make, model, engine specs, weight, and manufacturing details."
+    },
+    {
+      "info": {
+        "name": "Get carrier trailer fleet",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/trailers",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50, max: 200)"
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "type": "query",
+            "description": "Number of results to skip (default: 0)"
+          }
+        ]
+      },
+      "docs": "Returns the carrier's registered trailer fleet. Includes VIN, manufacturer, type, and reefer status."
+    },
+    {
+      "info": {
+        "name": "Get carrier inspection history",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/inspections",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50, max: 200)"
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "type": "query",
+            "description": "Number of results to skip (default: 0)"
+          }
+        ]
+      },
+      "docs": "Returns roadside inspection history with metadata and out-of-service counts. Use /v1/inspections/{inspection_id}/violations to get violation details for a specific inspection."
+    },
+    {
+      "info": {
+        "name": "Get violations for a specific inspection",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/inspections/:inspection_id/violations",
+        "params": [
+          {
+            "name": "inspection_id",
+            "value": "",
+            "type": "path",
+            "description": "The inspection report number"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 25, max: 100)"
+          }
+        ]
+      },
+      "docs": "Retrieve all violations from a specific roadside inspection. Use the inspection report number returned from the Inspections endpoint."
+    },
+    {
+      "info": {
+        "name": "Get carrier crash history",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/crashes",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "start_date",
+            "value": "",
+            "type": "query",
+            "description": "Filter from date (ISO 8601, e.g. \"2024-01-01\")"
+          },
+          {
+            "name": "end_date",
+            "value": "",
+            "type": "query",
+            "description": "Filter to date (ISO 8601, e.g. \"2024-12-31\")"
+          },
+          {
+            "name": "severity",
+            "value": "",
+            "type": "query",
+            "description": "Filter by severity"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 25, max: 100)"
+          }
+        ]
+      },
+      "docs": "Returns reported crash history with details, severity, and contributing factors."
+    },
+    {
+      "info": {
+        "name": "Get carrier news and press mentions",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/news",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "start_date",
+            "value": "",
+            "type": "query",
+            "description": "Filter from date (ISO 8601)"
+          },
+          {
+            "name": "end_date",
+            "value": "",
+            "type": "query",
+            "description": "Filter to date (ISO 8601)"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 25, max: 100)"
+          }
+        ]
+      },
+      "docs": "Returns recent news articles and press mentions related to the carrier."
+    },
+    {
+      "info": {
+        "name": "Find people at a carrier company",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/contacts/search",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "query",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "company_name",
+            "value": "",
+            "type": "query",
+            "description": "Company name to search (required if dot_number not provided)"
+          },
+          {
+            "name": "job_title",
+            "value": "",
+            "type": "query",
+            "description": "Filter by job title keyword (e.g. \"safety\", \"operations\")"
+          },
+          {
+            "name": "job_title_levels",
+            "value": "",
+            "type": "query",
+            "description": "Filter by seniority level"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 25, max: 100)"
+          }
+        ]
+      },
+      "docs": "Returns professional profiles including name, title, seniority, social profiles, and industry. Use dot_number or company_name to search. Note: This endpoint may return HTTP 202 with a Retry-After header if contacts are still being fetched — retry after the specified delay."
+    },
+    {
+      "info": {
+        "name": "Enrich a contact profile",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/contacts/:contact_id/enrich",
+        "params": [
+          {
+            "name": "contact_id",
+            "value": "",
+            "type": "path",
+            "description": "The contact ID returned from /v1/contacts/search"
+          }
+        ]
+      },
+      "docs": "Returns verified emails, phone numbers, skills, full work history, education, and social profiles. Consumes 1 enrichment credit per new lookup (cached results are free). Returns HTTP 402 when credits are exhausted."
+    },
+    {
+      "info": {
+        "name": "Advanced filtered carrier search",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://api.runalphaloops.com/v1/carriers/query",
+        "body": {
+          "type": "json",
+          "data": "{}"
+        }
+      },
+      "docs": "Filtered search with include/exclude conditions, geo-radius search, sorting, and field projection. No company name required — filter by state, fleet size, cargo type, technology, authority status, revenue, and more."
+    },
+    {
+      "info": {
+        "name": "Get carrier insurance filings",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/insurance",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50, max: 500)"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "sort_by",
+            "value": "",
+            "type": "query",
+            "description": "Sort field"
+          },
+          {
+            "name": "sort_order",
+            "value": "",
+            "type": "query",
+            "description": "Sort direction"
+          },
+          {
+            "name": "insurance_type",
+            "value": "",
+            "type": "query",
+            "description": "Filter by insurance type code (e.g. BIPD, CARGO, BOND)"
+          },
+          {
+            "name": "insurer",
+            "value": "",
+            "type": "query",
+            "description": "Partial match on insurance company name"
+          },
+          {
+            "name": "min_coverage",
+            "value": "",
+            "type": "query",
+            "description": "Minimum BIPD dollar limit"
+          },
+          {
+            "name": "date_from",
+            "value": "",
+            "type": "query",
+            "description": "Effective date start (ISO date)"
+          },
+          {
+            "name": "date_to",
+            "value": "",
+            "type": "query",
+            "description": "Effective date end (ISO date)"
+          }
+        ]
+      },
+      "docs": "Retrieve insurance filings (BIPD, cargo, bond) for a carrier from the FMCSA insurance table. Includes policy numbers, coverage limits, and insurer details."
+    },
+    {
+      "info": {
+        "name": "Get carrier insurance filings by MC number",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/mc/:mc_number/insurance",
+        "params": [
+          {
+            "name": "mc_number",
+            "value": "",
+            "type": "path",
+            "description": "MC docket number (numeric)"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 50, max: 500)"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          },
+          {
+            "name": "sort_by",
+            "value": "",
+            "type": "query",
+            "description": "Sort field"
+          },
+          {
+            "name": "sort_order",
+            "value": "",
+            "type": "query",
+            "description": "Sort direction"
+          },
+          {
+            "name": "insurance_type",
+            "value": "",
+            "type": "query",
+            "description": "Filter by insurance type code"
+          },
+          {
+            "name": "insurer",
+            "value": "",
+            "type": "query",
+            "description": "Partial match on insurance company name"
+          },
+          {
+            "name": "min_coverage",
+            "value": "",
+            "type": "query",
+            "description": "Minimum BIPD dollar limit"
+          }
+        ]
+      },
+      "docs": "Retrieve insurance filings by MC docket number. Same response shape and filters as the DOT-based insurance endpoint."
+    },
+    {
+      "info": {
+        "name": "Get carrier change-event and authority timeline",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/timeline",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Max results (default: 50, max: 200)"
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "type": "query",
+            "description": "Number of results to skip (default: 0)"
+          },
+          {
+            "name": "category",
+            "value": "",
+            "type": "query",
+            "description": "Comma-separated categories: contact, address, fleet, operations, authority, people"
+          },
+          {
+            "name": "date_from",
+            "value": "",
+            "type": "query",
+            "description": "Start date (ISO date)"
+          },
+          {
+            "name": "date_to",
+            "value": "",
+            "type": "query",
+            "description": "End date (ISO date)"
+          }
+        ]
+      },
+      "docs": "Merged chronological feed of carrier change events and authority history. Combines field-level changes from monthly FMCSA census diffs (contact, address, fleet, operations, authority, people) with authority history records."
+    },
+    {
+      "info": {
+        "name": "Get authority-for-sale listings for a carrier",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/mc-sales",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          }
+        ]
+      },
+      "docs": "Returns any authority-for-sale listings (Facebook groups, Telegram channels, BizBuySell, etc.) linked to this carrier's DOT number, with seller info, asking prices, post URLs, and matching reasoning. Returns found: false with mc_sale: null when no listings are linked."
+    },
+    {
+      "info": {
+        "name": "Get carrier fleet VINs listed for sale",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/equipment-for-sale",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Results per page (default: 25, max: 200)"
+          },
+          {
+            "name": "page",
+            "value": "",
+            "type": "query",
+            "description": "Page number (default: 1)"
+          }
+        ]
+      },
+      "docs": "Cross-references the VINs this carrier has been inspected with against a marketplace dataset of trucks and trailers currently (or recently) listed for sale. Returns one row per matching VIN, sorted by most recent inspection date. Empty results are common."
+    },
+    {
+      "info": {
+        "name": "Get a carrier's relationship graph",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/connections",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Max results (default: 50, max: 200)"
+          }
+        ]
+      },
+      "docs": "Retrieve a carrier's corporate connections graph — shared officers, addresses, phones, emails, and equipment linking it to other carriers."
+    },
+    {
+      "info": {
+        "name": "Get aggregated carrier risk signals",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/risk-signals",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "force_refresh",
+            "value": "",
+            "type": "query",
+            "description": "Set to true to bypass the cached risk summary and regenerate it from current signals (slower)."
+          },
+          {
+            "name": "include_equipment",
+            "value": "",
+            "type": "query",
+            "description": "Set to false to skip the equipment-marketplace VIN lookup for a faster response."
+          }
+        ]
+      },
+      "docs": "Aggregated carrier risk assessment in a single call. Returns an AI-generated risk score (0-10) and level, plus six signal categories — authority-for-sale listings, equipment-for-sale marketplace matches, financial-distress indicators, fraud/chameleon patterns, historical authority/insurance/change-event patterns, and recent news sentiment. Each category carries a derived level of \"high\", \"medium\", \"clear\", or \"unknown\". The risk summary is cached; pass force_refresh=true to force regeneration."
+    },
+    {
+      "info": {
+        "name": "Find carriers similar to a given carrier",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/similar",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          },
+          {
+            "name": "limit",
+            "value": "",
+            "type": "query",
+            "description": "Max results (default: 20, max: 100)"
+          }
+        ]
+      },
+      "docs": "Find carriers similar to the specified carrier based on fleet size, location, cargo type, and other attributes."
+    },
+    {
+      "info": {
+        "name": "Get an AI-generated carrier overview",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/carriers/:dot_number/overview",
+        "params": [
+          {
+            "name": "dot_number",
+            "value": "",
+            "type": "path",
+            "description": "The carrier's USDOT number"
+          }
+        ]
+      },
+      "docs": "Returns an AI-generated summary overview of a carrier including key highlights."
+    },
+    {
+      "info": {
+        "name": "Get inspection history for a VIN",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/inspections/vin/:vin",
+        "params": [
+          {
+            "name": "vin",
+            "value": "",
+            "type": "path",
+            "description": "Vehicle Identification Number (case-insensitive — normalized to uppercase server-side)"
+          }
+        ]
+      },
+      "docs": "Look up the inspection history for a VIN. Returns the unique DOT numbers the VIN has been associated with (with last date seen on each), plus the unique FIPS-coded county locations where the VIN has been inspected. Capped at the 5,000 most-recent inspections; successful responses are edge-cached for 24h."
+    },
+    {
+      "info": {
+        "name": "Look up one or more VINs",
+        "type": "http"
+      },
+      "http": {
+        "method": "GET",
+        "url": "https://api.runalphaloops.com/v1/vins",
+        "params": [
+          {
+            "name": "vin",
+            "value": "",
+            "type": "query",
+            "description": "A single VIN to look up (e.g. ?vin=3AKJHHDR3RSUV5213). Case-insensitive."
+          },
+          {
+            "name": "vins",
+            "value": "",
+            "type": "query",
+            "description": "Comma-separated list of VINs (e.g. ?vins=VIN1,VIN2,VIN3). Max 100."
+          }
+        ]
+      },
+      "docs": "For each VIN, returns its FMCSA inspection-unit history, most recent sighting, every DOT it has been associated with, and whether it has ever been listed for sale. Accepts a single VIN or a comma-separated list via query params. Max 100 VINs per request; results preserve input order and include misses (found: false)."
+    },
+    {
+      "info": {
+        "name": "Batch look up VINs",
+        "type": "http"
+      },
+      "http": {
+        "method": "POST",
+        "url": "https://api.runalphaloops.com/v1/vins",
+        "body": {
+          "type": "json",
+          "data": "{}"
+        }
+      },
+      "docs": "Batch form of the VIN lookup. Send a JSON array of VINs in the request body. Max 100 VINs per request; results preserve input order and include misses (found: false)."
+    }
+  ],
+  "bundled": true
+}
