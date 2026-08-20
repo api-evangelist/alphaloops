@@ -34,6 +34,20 @@ tags:
   - safer web api
   - dot lookup
   - carrier data
+  - Freight
+  - Trucking
+  - motor carrier
+  - fleet intelligence
+  - Sales Intelligence
+  - MCP Server
+  - Contact Enrichment
+  - Risk
+  - Fraud
+tags_raw:
+  - fmcsa api
+  - safer web api
+  - dot lookup
+  - carrier data
   - freight
   - trucking
   - motor carrier
@@ -54,6 +68,13 @@ apis:
   humanURL: https://runalphaloops.com/mcp
   baseURL: https://mcp-freight.runalphaloops.com
   tags:
+  - MCP Server
+  - carrier data
+  - Freight
+  - fleet intelligence
+  - Agent Tools
+  - Risk
+  tags_raw:
   - mcp server
   - carrier data
   - freight
