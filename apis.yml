@@ -94,16 +94,16 @@ apis:
     url: https://runalphaloops.com/mcp
   - type: WellKnown
     url: https://mcp-freight.runalphaloops.com/.well-known/oauth-authorization-server
-- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-carriers-api
+- aid: alphaloops:alphaloops-carriers-api
   name: AlphaLoops FMCSA Carrier Data API Carriers API
   description: The Carriers API from AlphaLoops FMCSA Carrier Data API — 19 operation(s) for carriers.
-  humanURL: https://runalphaloops.com/fmcsa-api/docs
-  baseURL: https://api.runalphaloops.com
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
   tags:
   - Carriers
   properties:
   - type: OpenAPI
-    url: openapi/alphaloops-fmcsa-carrier-data-api-carriers-api-openapi.yml
+    url: openapi/alphaloops-carriers-api-openapi.yml
   - type: Documentation
     url: https://runalphaloops.com/fmcsa-api/docs
   - type: Documentation
@@ -120,16 +120,16 @@ apis:
     url: rate-limits/alphaloops-rate-limits.yml
   - type: Plans
     url: plans/alphaloops-plans-pricing.yml
-- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-contacts-api
+- aid: alphaloops:alphaloops-contacts-api
   name: AlphaLoops FMCSA Carrier Data API Contacts API
   description: The Contacts API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for contacts.
-  humanURL: https://runalphaloops.com/fmcsa-api/docs
-  baseURL: https://api.runalphaloops.com
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
   tags:
   - Contacts
   properties:
   - type: OpenAPI
-    url: openapi/alphaloops-fmcsa-carrier-data-api-contacts-api-openapi.yml
+    url: openapi/alphaloops-contacts-api-openapi.yml
   - type: Documentation
     url: https://runalphaloops.com/fmcsa-api/docs
   - type: Documentation
@@ -146,17 +146,17 @@ apis:
     url: rate-limits/alphaloops-rate-limits.yml
   - type: Plans
     url: plans/alphaloops-plans-pricing.yml
-- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-inspections-api
+- aid: alphaloops:alphaloops-inspections-api
   name: AlphaLoops FMCSA Carrier Data API Inspections API
   description: >-
     The Inspections API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for inspections.
-  humanURL: https://runalphaloops.com/fmcsa-api/docs
-  baseURL: https://api.runalphaloops.com
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
   tags:
   - Inspections
   properties:
   - type: OpenAPI
-    url: openapi/alphaloops-fmcsa-carrier-data-api-inspections-api-openapi.yml
+    url: openapi/alphaloops-inspections-api-openapi.yml
   - type: Documentation
     url: https://runalphaloops.com/fmcsa-api/docs
   - type: Documentation
@@ -173,16 +173,16 @@ apis:
     url: rate-limits/alphaloops-rate-limits.yml
   - type: Plans
     url: plans/alphaloops-plans-pricing.yml
-- aid: alphaloops-fmcsa-carrier-data-api:alphaloops-fmcsa-carrier-data-api-vins-api
+- aid: alphaloops:alphaloops-vins-api
   name: AlphaLoops FMCSA Carrier Data API Vins API
   description: The Vins API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for vins.
-  humanURL: https://runalphaloops.com/fmcsa-api/docs
-  baseURL: https://api.runalphaloops.com
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
   tags:
   - Vins
   properties:
   - type: OpenAPI
-    url: openapi/alphaloops-fmcsa-carrier-data-api-vins-api-openapi.yml
+    url: openapi/alphaloops-vins-api-openapi.yml
   - type: Documentation
     url: https://runalphaloops.com/fmcsa-api/docs
   - type: Documentation
