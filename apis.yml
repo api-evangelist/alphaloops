@@ -112,6 +112,8 @@ apis:
   humanURL: https://runalphaloops.com/mcp
   baseURL: https://mcp-freight.runalphaloops.com
   tags:
+  - Carrier
+  tags_raw:
   - Carriers
   properties:
   - type: OpenAPI
@@ -165,6 +167,8 @@ apis:
   humanURL: https://runalphaloops.com/mcp
   baseURL: https://mcp-freight.runalphaloops.com
   tags:
+  - Inspection
+  tags_raw:
   - Inspections
   properties:
   - type: OpenAPI
