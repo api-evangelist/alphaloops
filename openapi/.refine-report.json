@@ -1,10 +1,7 @@
 {
   "provider": "alphaloops",
   "sources": [
-    "alphaloops-carriers-api-openapi.yml",
-    "alphaloops-contacts-api-openapi.yml",
-    "alphaloops-inspections-api-openapi.yml",
-    "alphaloops-vins-api-openapi.yml"
+    "_original/alphaloops-fmcsa-carrier-data-api-openapi.json"
   ],
   "outputs": [
     "alphaloops-carriers-api-openapi.yml",
@@ -16,7 +13,48 @@
   "errors": [],
   "warnings": [],
   "notes": [
+    "4 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number} -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/mc/{mc_number} -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/search -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/authority -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/trucks -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/trailers -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/inspections -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/inspections/{inspection_id}/violations -> Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/crashes -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/news -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/contacts/search -> Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/contacts/{contact_id}/enrich -> Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths POST /v1/carriers/query -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/insurance -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/mc/{mc_number}/insurance -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/timeline -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/mc-sales -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/equipment-for-sale -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/connections -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/risk-signals -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/similar -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/carriers/{dot_number}/overview -> Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/inspections/vin/{vin} -> Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths GET /v1/vins -> Vins",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: tagged paths POST /v1/vins -> Vins",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Carriers",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Contacts",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Inspections",
+    "alphaloops-fmcsa-carrier-data-api-openapi.json: declared missing tag: Vins",
     "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "_original/alphaloops-fmcsa-carrier-data-api-vins-api-openapi.yml: archived document superseded by a larger archived document",
+    "_original/alphaloops-fmcsa-carrier-data-api-inspections-api-openapi.yml: archived document superseded by a larger archived document",
+    "_original/alphaloops-fmcsa-carrier-data-api-contacts-api-openapi.yml: archived document superseded by a larger archived document",
+    "_original/alphaloops-fmcsa-carrier-data-api-carriers-api-openapi.yml: archived document superseded by a larger archived document",
+    "alphaloops-carriers-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "alphaloops-contacts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "alphaloops-inspections-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "alphaloops-vins-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

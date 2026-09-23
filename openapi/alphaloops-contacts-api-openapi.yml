@@ -133,7 +133,98 @@ paths:
       tags:
       - Contacts
 components:
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: 'Page number (default: 1)'
+  responses:
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    WorkExperience:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
+        is_primary:
+          type: boolean
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+        full_name:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        sex:
+          type: string
+        job_title:
+          type: string
+        job_title_role:
+          type: string
+        job_title_levels:
+          type: array
+          items:
+            type: string
+        job_company_name:
+          type: string
+        job_company_website:
+          type: string
+        job_company_size:
+          type: string
+        job_company_industry:
+          type: string
+        job_start_date:
+          type: string
+        industry:
+          type: string
+        linkedin_url:
+          type: string
+        facebook_url:
+          type: string
+          nullable: true
+        location_name:
+          type: string
+        location_region:
+          type: string
+        location_country:
+          type: string
     EnrichedContact:
       type: object
       description: Enriched contact profile with verified emails, phone numbers, work history, education, and social profiles. Consumes 1 enrichment credit per new lookup.
@@ -226,20 +317,19 @@ components:
               type: integer
             used:
               type: integer
-    WorkExperience:
+    ContactSearchResponse:
       type: object
       properties:
-        title:
+        dot_number:
           type: string
-        company:
-          type: string
-        start_date:
-          type: string
-        end_date:
-          type: string
-          nullable: true
-        is_primary:
-          type: boolean
+        total_contacts:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
     Pagination:
       type: object
       properties:
@@ -263,50 +353,6 @@ components:
       required:
       - error
       - message
-    Contact:
-      type: object
-      properties:
-        id:
-          type: string
-        full_name:
-          type: string
-        first_name:
-          type: string
-        last_name:
-          type: string
-        sex:
-          type: string
-        job_title:
-          type: string
-        job_title_role:
-          type: string
-        job_title_levels:
-          type: array
-          items:
-            type: string
-        job_company_name:
-          type: string
-        job_company_website:
-          type: string
-        job_company_size:
-          type: string
-        job_company_industry:
-          type: string
-        job_start_date:
-          type: string
-        industry:
-          type: string
-        linkedin_url:
-          type: string
-        facebook_url:
-          type: string
-          nullable: true
-        location_name:
-          type: string
-        location_region:
-          type: string
-        location_country:
-          type: string
     Education:
       type: object
       properties:
@@ -317,52 +363,6 @@ components:
         end_date:
           type: string
           nullable: true
-    ContactSearchResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_contacts:
-          type: integer
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contact'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-  responses:
-    NotFound:
-      description: Carrier does not exist
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-          description: Seconds to wait before retrying
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  parameters:
-    page:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 1
-      description: 'Page number (default: 1)'
   securitySchemes:
     bearerAuth:
       type: http

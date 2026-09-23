@@ -85,6 +85,15 @@ paths:
       tags:
       - Inspections
 components:
+  parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: 'Page number (default: 1)'
   responses:
     NotFound:
       description: Carrier does not exist
@@ -110,6 +119,47 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    VinDotAssociation:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        last_seen:
+          type: string
+          format: date
+        inspection_count:
+          type: integer
+    VinInspectionResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+        inspection_count:
+          type: integer
+        sample_size:
+          type: integer
+        truncated:
+          type: boolean
+          description: True when capped at 5,000 inspections; aggregations are over the returned sample.
+        dot_numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinDotAssociation'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinLocation'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
     VinLocation:
       type: object
       properties:
@@ -132,17 +182,6 @@ components:
           format: date
         inspection_count:
           type: integer
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
     Error:
       type: object
       properties:
@@ -155,26 +194,6 @@ components:
       required:
       - error
       - message
-    VinInspectionResponse:
-      type: object
-      properties:
-        vin:
-          type: string
-        inspection_count:
-          type: integer
-        sample_size:
-          type: integer
-        truncated:
-          type: boolean
-          description: True when capped at 5,000 inspections; aggregations are over the returned sample.
-        dot_numbers:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinDotAssociation'
-        locations:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinLocation'
     ViolationsResponse:
       type: object
       properties:
@@ -188,16 +207,6 @@ components:
             $ref: '#/components/schemas/Violation'
         pagination:
           $ref: '#/components/schemas/Pagination'
-    VinDotAssociation:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        last_seen:
-          type: string
-          format: date
-        inspection_count:
-          type: integer
     Violation:
       type: object
       properties:
@@ -211,15 +220,6 @@ components:
           type: string
         basic_category:
           type: string
-  parameters:
-    page:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 1
-      description: 'Page number (default: 1)'
   securitySchemes:
     bearerAuth:
       type: http

@@ -773,414 +773,6 @@ paths:
       - Carriers
 components:
   schemas:
-    McSaleListing:
-      type: object
-      properties:
-        seller_name:
-          type: string
-          nullable: true
-        phone:
-          type: string
-          nullable: true
-        email:
-          type: string
-          nullable: true
-        asking_price:
-          type: string
-          nullable: true
-        authority_age:
-          type: string
-          nullable: true
-        post_url:
-          type: string
-          nullable: true
-        source_file:
-          type: string
-          nullable: true
-        confidence:
-          type: number
-          nullable: true
-          description: 0–1 match confidence for this observation
-        reasoning:
-          type: string
-          nullable: true
-    EquipmentForSaleResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_listings:
-          type: integer
-        equipment:
-          type: array
-          items:
-            $ref: '#/components/schemas/EquipmentForSaleItem'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    ConnectionEdge:
-      type: object
-      properties:
-        source:
-          type: string
-        target:
-          type: string
-        connectionType:
-          type: string
-          description: shared_officer, shared_address, shared_phone, shared_email, shared_truck, shared_trailer, shared_surname
-        sharedCount:
-          type: integer
-      additionalProperties: true
-    AuthorityResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_records:
-          type: integer
-        limit:
-          type: integer
-        offset:
-          type: integer
-        authority_history:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuthorityRecord'
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-        city:
-          type: string
-        state:
-          type: string
-        zip:
-          type: string
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    ConnectionsResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_nodes:
-          type: integer
-        total_edges:
-          type: integer
-        nodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConnectionNode'
-        edges:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConnectionEdge'
-    TimelineEvent:
-      type: object
-      properties:
-        id:
-          oneOf:
-          - type: integer
-          - type: string
-        dot_number:
-          type: string
-        detected_at:
-          type: string
-          format: date
-        category:
-          type: string
-          enum:
-          - contact
-          - address
-          - fleet
-          - operations
-          - authority
-          - people
-        event_type:
-          type: string
-        headline:
-          type: string
-        field_name:
-          type: string
-          nullable: true
-        old_value:
-          type: string
-          nullable: true
-        new_value:
-          type: string
-          nullable: true
-        metadata:
-          type: object
-          nullable: true
-          additionalProperties: true
-        source:
-          type: string
-    SimilarResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        similar_carriers:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimilarCarrier'
-    EquipmentForSaleItem:
-      type: object
-      description: A fleet VIN matched to a marketplace listing. equipment_type determines which extra fields are populated.
-      properties:
-        equipment_type:
-          type: string
-          enum:
-          - truck
-          - trailer
-        vin:
-          type: string
-        last_seen_in_inspection:
-          type: string
-          format: date
-          nullable: true
-        inspection_count:
-          type: integer
-        listing_title:
-          type: string
-          nullable: true
-        manufacturer:
-          type: string
-          nullable: true
-        model:
-          type: string
-          nullable: true
-        model_year:
-          type: integer
-          nullable: true
-        price:
-          type: number
-          nullable: true
-        category:
-          type: string
-          nullable: true
-        description:
-          type: string
-          nullable: true
-      additionalProperties: true
-    AuthorityRecord:
-      type: object
-      properties:
-        docket_number:
-          type: string
-        sub_number:
-          type: string
-        authority_type:
-          type: string
-        original_action:
-          type: string
-        original_served_date:
-          type: string
-          format: date
-        disposition_action:
-          type: string
-        disposition_decided_date:
-          type: string
-          format: date
-        disposition_served_date:
-          type: string
-          format: date
-    TrailersResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_trailers:
-          type: integer
-        trailers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trailer'
-        limit:
-          type: integer
-        offset:
-          type: integer
-        total_results:
-          type: integer
-    RiskTriggeredCombo:
-      type: object
-      properties:
-        key:
-          type: string
-          description: Stable combo identifier (e.g. sold_mc_signature_30d)
-        label:
-          type: string
-          description: Human-readable description
-        severity:
-          type: string
-          enum:
-          - high
-          - medium
-    Crash:
-      type: object
-      properties:
-        crash_id:
-          type: string
-        report_number:
-          type: string
-        date:
-          type: string
-          format: date
-        state:
-          type: string
-        city:
-          type: string
-        location:
-          type: string
-        fatalities:
-          type: integer
-        injuries:
-          type: integer
-        tow_away:
-          type: boolean
-        hazmat_released:
-          type: boolean
-        severity:
-          type: string
-          enum:
-          - FATAL
-          - INJURY
-          - TOW
-          - PROPERTY_DAMAGE
-        vehicle_configuration:
-          type: string
-        cargo_body_type:
-          type: string
-        road_surface_condition:
-          type: string
-        trafficway:
-          type: string
-        weather_condition:
-          type: string
-        light_condition:
-          type: string
-        vehicles_in_accident:
-          type: integer
-        truck_or_bus:
-          type: string
-        gvw_rating:
-          type: string
-        federal_recordable:
-          type: boolean
-    NewsArticle:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        url:
-          type: string
-          format: uri
-        source:
-          type: string
-        date:
-          type: string
-          format: date-time
-        type:
-          type: string
-        sentiment:
-          type: string
-          enum:
-          - positive
-          - negative
-          - neutral
-        image_url:
-          type: string
-          format: uri
-          nullable: true
-        categories:
-          type: array
-          items:
-            type: string
-        topics:
-          type: array
-          items:
-            type: string
-        people:
-          type: array
-          items:
-            type: string
-        companies:
-          type: array
-          items:
-            type: string
-    Inspection:
-      type: object
-      properties:
-        inspection_id:
-          type: string
-        report_number:
-          type: string
-        date:
-          type: string
-          format: date
-        state:
-          type: string
-        level:
-          type: integer
-        start_time:
-          type: string
-        end_time:
-          type: string
-        location:
-          type: string
-        facility:
-          type: string
-        carrier_name:
-          type: string
-        shipper_name:
-          type: string
-        gross_vehicle_weight:
-          type: integer
-        violations_total:
-          type: integer
-        driver_violations:
-          type: integer
-        vehicle_violations:
-          type: integer
-        hazmat_violations:
-          type: integer
-        oos_total:
-          type: integer
-        oos_driver:
-          type: boolean
-        oos_vehicle:
-          type: boolean
-        oos_hazmat:
-          type: boolean
-        traffic_enforcement:
-          type: boolean
-        size_weight_enforcement:
-          type: boolean
     RiskSignalsResponse:
       type: object
       properties:
@@ -1347,23 +939,263 @@ components:
           type: integer
         total_results:
           type: integer
-    Trailer:
+    InsuranceResponse:
       type: object
       properties:
-        vin:
-          type: string
         dot_number:
           type: string
+        mc_number:
+          type: integer
+        total_policies:
+          type: integer
+        insurance:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsurancePolicy'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    EquipmentForSaleItem:
+      type: object
+      description: A fleet VIN matched to a marketplace listing. equipment_type determines which extra fields are populated.
+      properties:
+        equipment_type:
+          type: string
+          enum:
+          - truck
+          - trailer
+        vin:
+          type: string
+        last_seen_in_inspection:
+          type: string
+          format: date
+          nullable: true
+        inspection_count:
+          type: integer
+        listing_title:
+          type: string
+          nullable: true
         manufacturer:
           type: string
+          nullable: true
+        model:
+          type: string
+          nullable: true
         model_year:
           type: integer
-        trailer_type:
+          nullable: true
+        price:
+          type: number
+          nullable: true
+        category:
           type: string
-        reefer:
+          nullable: true
+        description:
+          type: string
+          nullable: true
+      additionalProperties: true
+    NewsArticle:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+          format: uri
+        source:
+          type: string
+        date:
+          type: string
+          format: date-time
+        type:
+          type: string
+        sentiment:
+          type: string
+          enum:
+          - positive
+          - negative
+          - neutral
+        image_url:
+          type: string
+          format: uri
+          nullable: true
+        categories:
+          type: array
+          items:
+            type: string
+        topics:
+          type: array
+          items:
+            type: string
+        people:
+          type: array
+          items:
+            type: string
+        companies:
+          type: array
+          items:
+            type: string
+    CompanyOfficer:
+      type: object
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        email:
+          type: string
+          format: email
+    FleetComposition:
+      type: object
+      properties:
+        owned:
+          type: integer
+        leased:
+          type: integer
+    AuthorityResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_records:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        authority_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorityRecord'
+    NewsResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_results:
+          type: integer
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewsArticle'
+    AuthorityRecord:
+      type: object
+      properties:
+        docket_number:
+          type: string
+        sub_number:
+          type: string
+        authority_type:
+          type: string
+        original_action:
+          type: string
+        original_served_date:
+          type: string
+          format: date
+        disposition_action:
+          type: string
+        disposition_decided_date:
+          type: string
+          format: date
+        disposition_served_date:
+          type: string
+          format: date
+    Crash:
+      type: object
+      properties:
+        crash_id:
+          type: string
+        report_number:
+          type: string
+        date:
+          type: string
+          format: date
+        state:
+          type: string
+        city:
+          type: string
+        location:
+          type: string
+        fatalities:
+          type: integer
+        injuries:
+          type: integer
+        tow_away:
           type: boolean
-        license_plate:
+        hazmat_released:
+          type: boolean
+        severity:
           type: string
+          enum:
+          - FATAL
+          - INJURY
+          - TOW
+          - PROPERTY_DAMAGE
+        vehicle_configuration:
+          type: string
+        cargo_body_type:
+          type: string
+        road_surface_condition:
+          type: string
+        trafficway:
+          type: string
+        weather_condition:
+          type: string
+        light_condition:
+          type: string
+        vehicles_in_accident:
+          type: integer
+        truck_or_bus:
+          type: string
+        gvw_rating:
+          type: string
+        federal_recordable:
+          type: boolean
+    TechnologyStack:
+      type: object
+      properties:
+        eld_provider:
+          type: string
+          description: ELD/telematics provider name
+        tms:
+          type: string
+          description: Transportation management system
+        fuel_card:
+          type: string
+          description: Fuel card provider
+    TimelineResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total:
+          type: integer
+        category_counts:
+          type: object
+          additionalProperties:
+            type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+    OverviewResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        overview:
+          type: string
+        highlights:
+          type: array
+          items:
+            type: string
     InsurancePolicy:
       type: object
       properties:
@@ -1413,55 +1245,15 @@ components:
               type: string
         insurance_company_name:
           type: string
-    Truck:
+    SimilarResponse:
       type: object
       properties:
-        vin:
-          type: string
         dot_number:
           type: string
-        cab_type:
-          type: string
-        make:
-          type: string
-        model:
-          type: string
-        model_year:
-          type: integer
-        engine_manufacturer:
-          type: string
-        engine_model:
-          type: string
-        engine_displacement:
-          type: string
-        engine_type:
-          type: string
-        engine_cylinders:
-          type: integer
-        license_plate:
-          type: string
-        manufactured_by:
-          type: string
-        manufactured_in:
-          type: string
-        gross_weight:
-          type: integer
-        body_type:
-          type: string
-        brake_system_type:
-          type: string
-        plant_city:
-          type: string
-        plant_state:
-          type: string
-    RiskSignalLevel:
-      type: string
-      enum:
-      - high
-      - medium
-      - clear
-      - unknown
-      description: Derived severity for a single signal category.
+        similar_carriers:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimilarCarrier'
     CarrierQueryRequest:
       type: object
       description: Filter body for POST /v1/carriers/query. All fields optional.
@@ -1506,39 +1298,6 @@ components:
         page:
           type: integer
           default: 1
-    ConnectionNode:
-      type: object
-      properties:
-        id:
-          type: string
-          description: DOT number
-        label:
-          type: string
-        state:
-          type: string
-          nullable: true
-        city:
-          type: string
-          nullable: true
-        isFocal:
-          type: boolean
-          description: True for the queried carrier
-      additionalProperties: true
-    GrowthMetrics:
-      type: object
-      properties:
-        power_units_12m:
-          type: integer
-          description: Net power unit change over 12 months
-        drivers_12m:
-          type: integer
-          description: Net driver change over 12 months
-        power_units_24m:
-          type: integer
-          description: Net power unit change over 24 months
-        drivers_24m:
-          type: integer
-          description: Net driver change over 24 months
     TrucksResponse:
       type: object
       properties:
@@ -1556,34 +1315,77 @@ components:
           type: integer
         total_results:
           type: integer
-    CrashesResponse:
+    Pagination:
       type: object
       properties:
-        dot_number:
-          type: string
-        total_crashes:
+        page:
           type: integer
-        crashes:
-          type: array
-          items:
-            $ref: '#/components/schemas/Crash'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    InsuranceResponse:
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    Inspection:
       type: object
       properties:
-        dot_number:
+        inspection_id:
           type: string
-        mc_number:
+        report_number:
+          type: string
+        date:
+          type: string
+          format: date
+        state:
+          type: string
+        level:
           type: integer
-        total_policies:
+        start_time:
+          type: string
+        end_time:
+          type: string
+        location:
+          type: string
+        facility:
+          type: string
+        carrier_name:
+          type: string
+        shipper_name:
+          type: string
+        gross_vehicle_weight:
           type: integer
-        insurance:
-          type: array
-          items:
-            $ref: '#/components/schemas/InsurancePolicy'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+        violations_total:
+          type: integer
+        driver_violations:
+          type: integer
+        vehicle_violations:
+          type: integer
+        hazmat_violations:
+          type: integer
+        oos_total:
+          type: integer
+        oos_driver:
+          type: boolean
+        oos_vehicle:
+          type: boolean
+        oos_hazmat:
+          type: boolean
+        traffic_enforcement:
+          type: boolean
+        size_weight_enforcement:
+          type: boolean
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
     CarrierSearchResponse:
       type: object
       properties:
@@ -1595,6 +1397,64 @@ components:
             $ref: '#/components/schemas/CarrierSearchResult'
         pagination:
           $ref: '#/components/schemas/Pagination'
+    Truck:
+      type: object
+      properties:
+        vin:
+          type: string
+        dot_number:
+          type: string
+        cab_type:
+          type: string
+        make:
+          type: string
+        model:
+          type: string
+        model_year:
+          type: integer
+        engine_manufacturer:
+          type: string
+        engine_model:
+          type: string
+        engine_displacement:
+          type: string
+        engine_type:
+          type: string
+        engine_cylinders:
+          type: integer
+        license_plate:
+          type: string
+        manufactured_by:
+          type: string
+        manufactured_in:
+          type: string
+        gross_weight:
+          type: integer
+        body_type:
+          type: string
+        brake_system_type:
+          type: string
+        plant_city:
+          type: string
+        plant_state:
+          type: string
+    ConnectionsResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_nodes:
+          type: integer
+        total_edges:
+          type: integer
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionNode'
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectionEdge'
     McSalesResponse:
       type: object
       properties:
@@ -1658,6 +1518,35 @@ components:
               type: string
               format: date-time
               nullable: true
+    RiskTriggeredCombo:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Stable combo identifier (e.g. sold_mc_signature_30d)
+        label:
+          type: string
+          description: Human-readable description
+        severity:
+          type: string
+          enum:
+          - high
+          - medium
+    GrowthMetrics:
+      type: object
+      properties:
+        power_units_12m:
+          type: integer
+          description: Net power unit change over 12 months
+        drivers_12m:
+          type: integer
+          description: Net driver change over 12 months
+        power_units_24m:
+          type: integer
+          description: Net power unit change over 24 months
+        drivers_24m:
+          type: integer
+          description: Net driver change over 24 months
     SimilarCarrier:
       type: object
       properties:
@@ -1691,89 +1580,166 @@ components:
         confidence:
           type: number
           description: Match confidence score 0.0–1.0
-    TechnologyStack:
+    ConnectionNode:
       type: object
       properties:
-        eld_provider:
+        id:
           type: string
-          description: ELD/telematics provider name
-        tms:
+          description: DOT number
+        label:
           type: string
-          description: Transportation management system
-        fuel_card:
+        state:
           type: string
-          description: Fuel card provider
-    NewsResponse:
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        isFocal:
+          type: boolean
+          description: True for the queried carrier
+      additionalProperties: true
+    Trailer:
+      type: object
+      properties:
+        vin:
+          type: string
+        dot_number:
+          type: string
+        manufacturer:
+          type: string
+        model_year:
+          type: integer
+        trailer_type:
+          type: string
+        reefer:
+          type: boolean
+        license_plate:
+          type: string
+    TrailersResponse:
       type: object
       properties:
         dot_number:
           type: string
-        total_results:
+        total_trailers:
           type: integer
-        articles:
+        trailers:
           type: array
           items:
-            $ref: '#/components/schemas/NewsArticle'
-    CarrierQueryResponse:
-      type: object
-      properties:
-        total_results:
-          type: integer
-        results:
-          type: array
-          description: Carrier objects projected to the requested fields (or default fields when fields is omitted). When a geo-radius filter is used, each result includes distance_miles.
-          items:
-            type: object
-            additionalProperties: true
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    FleetComposition:
-      type: object
-      properties:
-        owned:
-          type: integer
-        leased:
-          type: integer
-    CompanyOfficer:
-      type: object
-      properties:
-        name:
-          type: string
-        title:
-          type: string
-        email:
-          type: string
-          format: email
-    TimelineResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total:
-          type: integer
-        category_counts:
-          type: object
-          additionalProperties:
-            type: integer
+            $ref: '#/components/schemas/Trailer'
         limit:
           type: integer
         offset:
           type: integer
-        events:
-          type: array
-          items:
-            $ref: '#/components/schemas/TimelineEvent'
-    OverviewResponse:
+        total_results:
+          type: integer
+    TimelineEvent:
+      type: object
+      properties:
+        id:
+          oneOf:
+          - type: integer
+          - type: string
+        dot_number:
+          type: string
+        detected_at:
+          type: string
+          format: date
+        category:
+          type: string
+          enum:
+          - contact
+          - address
+          - fleet
+          - operations
+          - authority
+          - people
+        event_type:
+          type: string
+        headline:
+          type: string
+        field_name:
+          type: string
+          nullable: true
+        old_value:
+          type: string
+          nullable: true
+        new_value:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+        source:
+          type: string
+    ConnectionEdge:
+      type: object
+      properties:
+        source:
+          type: string
+        target:
+          type: string
+        connectionType:
+          type: string
+          description: shared_officer, shared_address, shared_phone, shared_email, shared_truck, shared_trailer, shared_surname
+        sharedCount:
+          type: integer
+      additionalProperties: true
+    CrashesResponse:
       type: object
       properties:
         dot_number:
           type: string
-        overview:
-          type: string
-        highlights:
+        total_crashes:
+          type: integer
+        crashes:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/Crash'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    McSaleListing:
+      type: object
+      properties:
+        seller_name:
+          type: string
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        asking_price:
+          type: string
+          nullable: true
+        authority_age:
+          type: string
+          nullable: true
+        post_url:
+          type: string
+          nullable: true
+        source_file:
+          type: string
+          nullable: true
+        confidence:
+          type: number
+          nullable: true
+          description: 0–1 match confidence for this observation
+        reasoning:
+          type: string
+          nullable: true
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
     CarrierProfile:
       type: object
       description: Full carrier profile with 200+ fields. Key fields shown below — use ?fields= to project specific fields.
@@ -1887,25 +1853,73 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CompanyOfficer'
+    RiskSignalLevel:
+      type: string
+      enum:
+      - high
+      - medium
+      - clear
+      - unknown
+      description: Derived severity for a single signal category.
+    EquipmentForSaleResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_listings:
+          type: integer
+        equipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/EquipmentForSaleItem'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    CarrierQueryResponse:
+      type: object
+      properties:
+        total_results:
+          type: integer
+        results:
+          type: array
+          description: Carrier objects projected to the requested fields (or default fields when fields is omitted). When a geo-radius filter is used, each result includes distance_miles.
+          items:
+            type: object
+            additionalProperties: true
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+  parameters:
+    dotNumber:
+      name: dot_number
+      in: path
+      required: true
+      schema:
+        type: string
+      description: The carrier's USDOT number
+    page:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+      description: 'Page number (default: 1)'
+    offset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 0
+      description: 'Number of results to skip (default: 0)'
+    limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 50
+      description: 'Results per page (default: 50)'
   responses:
-    NotFound:
-      description: Carrier does not exist
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     RateLimited:
       description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
       headers:
@@ -1917,38 +1931,24 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    page:
-      name: page
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 1
-      description: 'Page number (default: 1)'
-    limit:
-      name: limit
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 50
-      description: 'Results per page (default: 50)'
-    dotNumber:
-      name: dot_number
-      in: path
-      required: true
-      schema:
-        type: string
-      description: The carrier's USDOT number
-    offset:
-      name: offset
-      in: query
-      required: false
-      schema:
-        type: integer
-        default: 0
-      description: 'Number of results to skip (default: 0)'
+    BadRequest:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http
