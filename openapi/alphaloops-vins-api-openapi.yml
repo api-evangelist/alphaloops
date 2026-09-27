@@ -89,6 +89,28 @@ paths:
       - Vins
 components:
   schemas:
+    VinsResponse:
+      type: object
+      properties:
+        requested:
+          type: integer
+          description: Unique VIN count after normalization
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinResult'
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
     VinResult:
       type: object
       properties:
@@ -137,35 +159,7 @@ components:
               type: object
               nullable: true
               additionalProperties: true
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    VinsResponse:
-      type: object
-      properties:
-        requested:
-          type: integer
-          description: Unique VIN count after normalization
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinResult'
   responses:
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     BadRequest:
       description: Invalid parameters
       content:
@@ -179,6 +173,12 @@ components:
           schema:
             type: integer
           description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Invalid or missing API key
       content:
         application/json:
           schema:

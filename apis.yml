@@ -53,8 +53,8 @@ tags:
   - Sales Intelligence
   - MCP Server
   - Contact Enrichment
-  - Risk
-  - Fraud
+  - Risk Management
+  - Fraud Prevention
 tags_raw:
   - fmcsa api
   - safer web api
@@ -69,6 +69,8 @@ tags_raw:
   - contact enrichment
   - risk
   - fraud
+  - Risk
+  - Fraud
 apis:
 - name: AlphaLoops MCP Server
   description: >-
@@ -85,7 +87,7 @@ apis:
   - Freight
   - fleet intelligence
   - Agent Tools
-  - Risk
+  - Risk Management
   tags_raw:
   - mcp server
   - carrier data
@@ -93,6 +95,7 @@ apis:
   - fleet intelligence
   - agent tools
   - risk
+  - Risk
   properties:
   - type: MCPServer
     url: https://mcp-freight.runalphaloops.com/mcp
