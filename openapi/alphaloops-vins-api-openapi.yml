@@ -160,12 +160,6 @@ components:
               nullable: true
               additionalProperties: true
   responses:
-    BadRequest:
-      description: Invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     RateLimited:
       description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
       headers:
@@ -173,6 +167,12 @@ components:
           schema:
             type: integer
           description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid parameters
       content:
         application/json:
           schema:

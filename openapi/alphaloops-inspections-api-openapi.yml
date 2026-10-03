@@ -85,7 +85,110 @@ paths:
       tags:
       - Inspections
 components:
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    VinInspectionResponse:
+      type: object
+      properties:
+        vin:
+          type: string
+        inspection_count:
+          type: integer
+        sample_size:
+          type: integer
+        truncated:
+          type: boolean
+          description: True when capped at 5,000 inspections; aggregations are over the returned sample.
+        dot_numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinDotAssociation'
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinLocation'
+    ViolationsResponse:
+      type: object
+      properties:
+        inspection_id:
+          type: string
+        total_violations:
+          type: integer
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Violation'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    VinDotAssociation:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        last_seen:
+          type: string
+          format: date
+        inspection_count:
+          type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    Violation:
+      type: object
+      properties:
+        violation_code:
+          type: string
+        description:
+          type: string
+        oos:
+          type: boolean
+        unit_type:
+          type: string
+        basic_category:
+          type: string
     VinLocation:
       type: object
       properties:
@@ -108,109 +211,6 @@ components:
           format: date
         inspection_count:
           type: integer
-    VinInspectionResponse:
-      type: object
-      properties:
-        vin:
-          type: string
-        inspection_count:
-          type: integer
-        sample_size:
-          type: integer
-        truncated:
-          type: boolean
-          description: True when capped at 5,000 inspections; aggregations are over the returned sample.
-        dot_numbers:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinDotAssociation'
-        locations:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinLocation'
-    Violation:
-      type: object
-      properties:
-        violation_code:
-          type: string
-        description:
-          type: string
-        oos:
-          type: boolean
-        unit_type:
-          type: string
-        basic_category:
-          type: string
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    ViolationsResponse:
-      type: object
-      properties:
-        inspection_id:
-          type: string
-        total_violations:
-          type: integer
-        violations:
-          type: array
-          items:
-            $ref: '#/components/schemas/Violation'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
-    VinDotAssociation:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        last_seen:
-          type: string
-          format: date
-        inspection_count:
-          type: integer
-  responses:
-    RateLimited:
-      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-          description: Seconds to wait before retrying
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Carrier does not exist
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   parameters:
     page:
       name: page
