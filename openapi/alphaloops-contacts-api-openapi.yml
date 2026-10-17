@@ -133,31 +133,44 @@ paths:
       tags:
       - Contacts
 components:
-  responses:
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-          description: Seconds to wait before retrying
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Carrier does not exist
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
+    ContactSearchResponse:
+      type: object
+      properties:
+        dot_number:
+          type: string
+        total_contacts:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    WorkExperience:
+      type: object
+      properties:
+        title:
+          type: string
+        company:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
+        is_primary:
+          type: boolean
+    Education:
+      type: object
+      properties:
+        school:
+          type: string
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
     EnrichedContact:
       type: object
       description: Enriched contact profile with verified emails, phone numbers, work history, education, and social profiles. Consumes 1 enrichment credit per new lookup.
@@ -250,6 +263,29 @@ components:
               type: integer
             used:
               type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
     Contact:
       type: object
       properties:
@@ -294,66 +330,30 @@ components:
           type: string
         location_country:
           type: string
-    WorkExperience:
-      type: object
-      properties:
-        title:
-          type: string
-        company:
-          type: string
-        start_date:
-          type: string
-        end_date:
-          type: string
-          nullable: true
-        is_primary:
-          type: boolean
-    ContactSearchResponse:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        total_contacts:
-          type: integer
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contact'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
-    Education:
-      type: object
-      properties:
-        school:
-          type: string
-        start_date:
-          type: string
-        end_date:
-          type: string
-          nullable: true
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Carrier does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   parameters:
     page:
       name: page
