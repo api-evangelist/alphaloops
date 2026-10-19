@@ -1,0 +1,359 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Mc Sale Listings API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Mc Sale Listings
+paths:
+  /v1/mc-sale-listings:
+    get:
+      operationId: listMcSaleListings
+      summary: Raw authority-for-sale listings feed
+      description: Cursor-paginated feed of raw listings across all monitored sale channels and marketplaces, independent of carrier resolution. Ordered posted-at descending; follow next_cursor until has_more is false. Offset/page params return 400.
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+      - name: cursor
+        in: query
+        schema:
+          type: string
+        description: Opaque next_cursor from a previous response
+      - name: source
+        in: query
+        schema:
+          type: string
+        description: 'Comma-separated subset of: facebook_group, facebook_page, telegram, mcxchange, bizbuysell'
+      - name: posted_after
+        in: query
+        schema:
+          type: string
+          format: date-time
+          description: ISO-8601 — posts on/after (date-only "before" values include the whole day)
+      - name: posted_before
+        in: query
+        schema:
+          type: string
+          format: date-time
+          description: ISO-8601 — posts on/before (date-only "before" values include the whole day)
+      - name: state
+        in: query
+        schema:
+          type: string
+        description: 2-letter authority state extracted from the post
+      - name: min_price
+        in: query
+        schema:
+          type: number
+        description: Only listings with a parsed price >= this (parsed prices are bounded $1-$1M)
+      - name: max_price
+        in: query
+        schema:
+          type: number
+      - name: amazon_status
+        in: query
+        schema:
+          type: string
+        description: Live | Suspended | Not Applicable — sources without Amazon metadata are excluded when set
+      - name: highway_setup
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: One page of the raw listings feed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/McSaleListingsFeedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Mc Sale Listings
+components:
+  schemas:
+    McSaleListingAuthority:
+      type:
+      - object
+      - 'null'
+      description: Authority details extracted from the post text — the SELLER’S CLAIMS, not FMCSA records; cross-check against /authority.
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - string
+          - 'null'
+        state:
+          type:
+          - string
+          - 'null'
+        mc_number:
+          type:
+          - string
+          - 'null'
+        dot_number:
+          type:
+          - string
+          - 'null'
+        granted_date:
+          type:
+          - string
+          - 'null'
+        granted_date_precision:
+          type:
+          - string
+          - 'null'
+          description: one of exact | month | year | age — "age" dates are back-computed and ±1 year
+        reinstated_date:
+          type:
+          - string
+          - 'null'
+        ein_disclosed:
+          type: boolean
+    McSaleListingSafety:
+      type:
+      - object
+      - 'null'
+      description: Safety stats as claimed in the post text, not FMCSA records.
+      properties:
+        total_inspections:
+          type:
+          - integer
+          - 'null'
+        total_violations:
+          type:
+          - integer
+          - 'null'
+        total_crashes:
+          type:
+          - integer
+          - 'null'
+        vehicle_oos_pct:
+          type:
+          - number
+          - 'null'
+        driver_oos_pct:
+          type:
+          - number
+          - 'null'
+        vehicle_oos_count:
+          type:
+          - integer
+          - 'null'
+        driver_oos_count:
+          type:
+          - integer
+          - 'null'
+    McSaleListingsFeedResponse:
+      type: object
+      properties:
+        listings:
+          type: array
+          items:
+            $ref: '#/components/schemas/McSaleFeedItem'
+        limit:
+          type: integer
+        has_more:
+          type: boolean
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Opaque keyset cursor — pass back verbatim; page/offset params return 400
+    McSaleListingAssets:
+      type:
+      - object
+      - 'null'
+      description: 'What the seller says is included. Booleans are tri-state: null means the post didn’t mention it.'
+      properties:
+        highway_setup:
+          type:
+          - boolean
+          - 'null'
+        amazon_status:
+          type:
+          - string
+          - 'null'
+          description: Live | Suspended | Not Applicable | null
+        bank_name:
+          type:
+          - string
+          - 'null'
+        factoring_name:
+          type:
+          - string
+          - 'null'
+        insurer:
+          type:
+          - string
+          - 'null'
+        insurance_limit_k:
+          type:
+          - number
+          - 'null'
+        fleet_size:
+          type:
+          - integer
+          - 'null'
+        email_included:
+          type:
+          - boolean
+          - 'null'
+        phone_included:
+          type:
+          - boolean
+          - 'null'
+    McSaleListingPost:
+      type:
+      - object
+      - 'null'
+      description: Source-post metadata. The whole group is null when the source post is no longer available.
+      properties:
+        source:
+          type: string
+          enum:
+          - facebook_group
+          - facebook_page
+          - telegram
+          - mcxchange
+          - bizbuysell
+        source_url:
+          type:
+          - string
+          - 'null'
+        source_name:
+          type:
+          - string
+          - 'null'
+        posted_at:
+          type:
+          - string
+          - 'null'
+        engagement:
+          type:
+          - object
+          - 'null'
+          properties:
+            likes:
+              type: integer
+            comments:
+              type: integer
+            shares:
+              type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    McSaleFeedItem:
+      type: object
+      description: One raw listing from the cross-source feed, independent of carrier resolution.
+      properties:
+        id:
+          type: string
+          description: source-prefixed stable id, e.g. "facebook_group:<uuid>"
+        post_url:
+          type:
+          - string
+          - 'null'
+        post_text:
+          type:
+          - string
+          - 'null'
+        seller_name:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+        email:
+          type:
+          - string
+          - 'null'
+        linked_dot_numbers:
+          type: array
+          items:
+            type: integer
+          description: DOTs this listing has been resolved to (empty when unresolved)
+        post:
+          $ref: '#/components/schemas/McSaleListingPost'
+        authority:
+          $ref: '#/components/schemas/McSaleListingAuthority'
+        safety:
+          $ref: '#/components/schemas/McSaleListingSafety'
+        included_assets:
+          $ref: '#/components/schemas/McSaleListingAssets'
+        asking_price_usd:
+          type:
+          - number
+          - 'null'
+          description: Parsed numeric price; null when unparsed or outside $1-$1M sanity bounds
+        sold:
+          type:
+          - boolean
+          - 'null'
+          description: true once a sold marker is detected; expect lag
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'

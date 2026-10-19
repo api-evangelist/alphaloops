@@ -88,6 +88,30 @@ paths:
       tags:
       - Vins
 components:
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     VinResult:
       type: object
@@ -137,6 +161,16 @@ components:
               type: object
               nullable: true
               additionalProperties: true
+    VinsResponse:
+      type: object
+      properties:
+        requested:
+          type: integer
+          description: Unique VIN count after normalization
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VinResult'
     Error:
       type: object
       properties:
@@ -149,40 +183,6 @@ components:
       required:
       - error
       - message
-    VinsResponse:
-      type: object
-      properties:
-        requested:
-          type: integer
-          description: Unique VIN count after normalization
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/VinResult'
-  responses:
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
-      headers:
-        Retry-After:
-          schema:
-            type: integer
-          description: Seconds to wait before retrying
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid parameters
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   securitySchemes:
     bearerAuth:
       type: http

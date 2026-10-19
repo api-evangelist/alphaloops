@@ -86,16 +86,6 @@ paths:
       - Inspections
 components:
   schemas:
-    VinDotAssociation:
-      type: object
-      properties:
-        dot_number:
-          type: string
-        last_seen:
-          type: string
-          format: date
-        inspection_count:
-          type: integer
     Violation:
       type: object
       properties:
@@ -109,42 +99,6 @@ components:
           type: string
         basic_category:
           type: string
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
-    ViolationsResponse:
-      type: object
-      properties:
-        inspection_id:
-          type: string
-        total_violations:
-          type: integer
-        violations:
-          type: array
-          items:
-            $ref: '#/components/schemas/Violation'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
     VinLocation:
       type: object
       properties:
@@ -162,6 +116,52 @@ components:
           type: number
         longitude:
           type: number
+        last_seen:
+          type: string
+          format: date
+        inspection_count:
+          type: integer
+    ViolationsResponse:
+      type: object
+      properties:
+        inspection_id:
+          type: string
+        total_violations:
+          type: integer
+        violations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Violation'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    VinDotAssociation:
+      type: object
+      properties:
+        dot_number:
+          type: string
         last_seen:
           type: string
           format: date

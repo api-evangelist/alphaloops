@@ -1,0 +1,342 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Custom Data API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Custom Data
+paths:
+  /v1/custom-data/fields:
+    get:
+      operationId: getCustomDataFields
+      summary: Discover custom data availability and schema
+      description: 'Whether custom data is enabled for the calling account, and the schema of the exposed fields. Safe capability probe: a key without custom data receives 200 with custom_data_enabled: false, never 403. Call this before using the custom-data endpoints.'
+      responses:
+        '200':
+          description: Capability flag and field schema
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDataFieldsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/CustomDataMisconfigured'
+      tags:
+      - Custom Data
+  /v1/custom-data:
+    get:
+      operationId: listCustomData
+      summary: List custom-data records
+      description: Paginated collection of the account’s custom-data records. Page mode for browsing; cursor (keyset) mode — required for full exports — forces dot_number ascending order (lexicographic; dot_number is a string). Use updated_after for incremental sync after an initial export. Full exports typically exceed the default daily quota; contact support to arrange a limit increase first.
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 100
+          maximum: 1000
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+        description: 1-based. Mutually exclusive with cursor (400 if both are sent).
+      - name: cursor
+        in: query
+        schema:
+          type: string
+        description: Opaque next_cursor from a previous response. Follow until has_more is false.
+      - name: dot_number
+        in: query
+        schema:
+          type: string
+        description: Comma-separated list of up to 50 DOT numbers (each 1-8 digits); use POST /v1/custom-data/lookup for larger batches
+      - name: updated_after
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: ISO-8601; records loaded on/after
+      - name: updated_before
+        in: query
+        schema:
+          type: string
+          format: date-time
+        description: ISO-8601; date-only values include the whole day
+      - name: sort_by
+        in: query
+        schema:
+          type: string
+          enum:
+          - updated_at
+          - dot_number
+          default: updated_at
+        description: Ignored in cursor mode; other values return 400
+      - name: sort_order
+        in: query
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+          default: desc
+      responses:
+        '200':
+          description: Records with page- or cursor-mode pagination
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDataCollectionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CustomDataNotEnabled'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/CustomDataMisconfigured'
+      tags:
+      - Custom Data
+  /v1/custom-data/lookup:
+    post:
+      operationId: lookupCustomData
+      summary: Batch custom-data lookup
+      description: Custom-data records for up to 500 DOT numbers in one call. Records come back under the requested DOT number; misses are listed in missing_dot_numbers. Optional fields projection narrows the returned custom_data keys.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomDataLookupRequest'
+      responses:
+        '200':
+          description: Batch results with found/missing partition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDataLookupResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/CustomDataNotEnabled'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/CustomDataMisconfigured'
+      tags:
+      - Custom Data
+components:
+  schemas:
+    CustomDataField:
+      type: object
+      description: Descriptor for one account-specific custom data field.
+      properties:
+        field_key:
+          type: string
+          description: Key used inside custom_data objects and in POST /v1/custom-data/lookup field projections
+        display_name:
+          type:
+          - string
+          - 'null'
+        data_type:
+          type:
+          - string
+          - 'null'
+          description: e.g. number, boolean, text — from the account’s CRM configuration
+    CustomDataLookupResponse:
+      type: object
+      properties:
+        requested_count:
+          type: integer
+          description: After deduplication
+        found_count:
+          type: integer
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataRecord'
+        missing_dot_numbers:
+          type: array
+          items:
+            type: string
+          description: Requested DOTs with no record, echoed as requested
+    CustomDataFieldsResponse:
+      type: object
+      properties:
+        custom_data_enabled:
+          type: boolean
+        source_integration:
+          type: string
+          enum:
+          - salesforce
+          - hubspot
+          description: Present when enabled
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataField'
+        total_records:
+          type: integer
+          description: Estimated record count (present when enabled)
+        message:
+          type: string
+          description: Present when not enabled
+      required:
+      - custom_data_enabled
+      - fields
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    CustomDataRecord:
+      type: object
+      description: One custom-data record. Fields appear only inside custom_data, never at the top level.
+      properties:
+        dot_number:
+          type: string
+          description: Echoes the requested DOT number
+        custom_data:
+          type: object
+          additionalProperties: true
+          description: Only the account’s enabled fields, keyed by field_key. Missing values are null.
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: When the record was last loaded into AlphaLoops (not real-time CRM state)
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    CustomDataLookupRequest:
+      type: object
+      required:
+      - dot_numbers
+      properties:
+        dot_numbers:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: string
+            pattern: ^\d{1,8}$
+          description: 1-500 DOT numbers; numbers are coerced to strings
+        fields:
+          type: array
+          items:
+            type: string
+          description: 'Optional projection: subset of the account’s field keys. Unknown keys return 400.'
+    CustomDataCollectionResponse:
+      type: object
+      properties:
+        total_results:
+          type: integer
+          description: Page mode only. May be approximate when no filters are applied; exact when filtered.
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataField'
+        records:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataRecord'
+        pagination:
+          description: 'Page mode: page/limit/total_results/total_pages. Cursor mode: limit/next_cursor/has_more (next_cursor null when done), no totals.'
+          oneOf:
+          - $ref: '#/components/schemas/Pagination'
+          - type: object
+            properties:
+              limit:
+                type: integer
+              next_cursor:
+                type:
+                - string
+                - 'null'
+                description: Pass as ?cursor= for the next page; null when the export is complete
+              has_more:
+                type: boolean
+  responses:
+    CustomDataMisconfigured:
+      description: The account’s custom data configuration is invalid. Contact support; retrying will not help.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Custom data misconfigured
+            message: Your custom data configuration is invalid. Contact support.
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    CustomDataNotEnabled:
+      description: Custom data is not enabled for this account. Not an auth failure and not transient — do not retry with backoff; probe GET /v1/custom-data/fields instead.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: Custom data not enabled
+            message: Your account does not have custom data configured. Call GET /v1/custom-data/fields to check availability or contact support to enable it.
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'

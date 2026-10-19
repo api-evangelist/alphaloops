@@ -1,0 +1,112 @@
+openapi: 3.2.0
+info:
+  title: AlphaLoops FMCSA Carrier Data Peer Groups API
+  version: 1.0.0
+  description: 'Fleet intelligence API for looking up FMCSA-registered carriers by DOT number, MC number, or company name. Access carrier profiles with 200+ fields, safety data, authority history, fleet equipment, inspections, crashes, news, and decision-maker contacts.
+
+
+    Base URL: https://api.runalphaloops.com
+
+
+    API access is available exclusively on the Enterprise plan. Contact sales at https://runalphaloops.com/contact to get your API key.'
+  contact:
+    name: AlphaLoops
+    url: https://runalphaloops.com/contact
+    email: hello@runalphaloop.com
+servers:
+- url: https://api.runalphaloops.com
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Peer Groups
+paths:
+  /v1/peer-groups:
+    get:
+      operationId: listPeerGroups
+      summary: List safety-benchmark peer lenses
+      description: 'The 33 peer framings accepted by the peer_group parameter: industry, 7 single axes, 21 axis pairs, and the 4 canonical scoring groups the fixed grade is computed against. Static metadata — call once to build a lens picker.'
+      responses:
+        '200':
+          description: All peer-group definitions plus the reliability threshold
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PeerGroupsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+      tags:
+      - Peer Groups
+components:
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests. Check X-RateLimit-Remaining and Retry-After headers.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    PeerGroupDef:
+      type: object
+      properties:
+        group_type:
+          type: string
+          description: Value accepted by the peer_group parameter
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+          - industry
+          - axis
+          - axis_pair
+          - canonical
+        axes:
+          type: array
+          items:
+            type: string
+        precomputed:
+          type: boolean
+          description: true for the 5 lenses whose percentiles the pipeline scores directly
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
+    PeerGroupsResponse:
+      type: object
+      properties:
+        peer_groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeerGroupDef'
+        total:
+          type: integer
+        reliable_min_n:
+          type: integer
+          description: Bucket size below which a comparison is flagged low_sample (±5% at 95% CI)
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'

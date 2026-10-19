@@ -218,6 +218,49 @@ apis:
     url: rate-limits/alphaloops-rate-limits.yml
   - type: Plans
     url: plans/alphaloops-plans-pricing.yml
+- aid: alphaloops:alphaloops-custom-data-api
+  name: AlphaLoops FMCSA Carrier Data API Custom Data API
+  description: >-
+    The Custom Data API from AlphaLoops FMCSA Carrier Data API — 3 operation(s) for custom data.
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
+  tags:
+  - Custom Data
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-custom-data-api-openapi.yml
+- aid: alphaloops:alphaloops-mc-sale-listings-api
+  name: AlphaLoops FMCSA Carrier Data API Mc Sale Listings API
+  description: >-
+    The Mc Sale Listings API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for mc sale listings.
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
+  tags:
+  - Mc Sale Listings
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-mc-sale-listings-api-openapi.yml
+- aid: alphaloops:alphaloops-mc-sales-api
+  name: AlphaLoops FMCSA Carrier Data API Mc Sales API
+  description: The Mc Sales API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for mc sales.
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
+  tags:
+  - Mc Sales
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-mc-sales-api-openapi.yml
+- aid: alphaloops:alphaloops-peer-groups-api
+  name: AlphaLoops FMCSA Carrier Data API Peer Groups API
+  description: >-
+    The Peer Groups API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for peer groups.
+  humanURL: https://runalphaloops.com/mcp
+  baseURL: https://mcp-freight.runalphaloops.com
+  tags:
+  - Peer Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/alphaloops-peer-groups-api-openapi.yml
 maintainers:
   - FN: AlphaLoops
     url: https://runalphaloops.com

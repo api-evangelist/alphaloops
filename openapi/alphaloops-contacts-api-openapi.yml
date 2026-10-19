@@ -134,19 +134,16 @@ paths:
       - Contacts
 components:
   schemas:
-    ContactSearchResponse:
+    Education:
       type: object
       properties:
-        dot_number:
+        school:
           type: string
-        total_contacts:
-          type: integer
-        contacts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Contact'
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+        start_date:
+          type: string
+        end_date:
+          type: string
+          nullable: true
     WorkExperience:
       type: object
       properties:
@@ -161,16 +158,19 @@ components:
           nullable: true
         is_primary:
           type: boolean
-    Education:
+    ContactSearchResponse:
       type: object
       properties:
-        school:
+        dot_number:
           type: string
-        start_date:
-          type: string
-        end_date:
-          type: string
-          nullable: true
+        total_contacts:
+          type: integer
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
     EnrichedContact:
       type: object
       description: Enriched contact profile with verified emails, phone numbers, work history, education, and social profiles. Consumes 1 enrichment credit per new lookup.
@@ -263,29 +263,6 @@ components:
               type: integer
             used:
               type: integer
-    Error:
-      type: object
-      properties:
-        error:
-          type: string
-          description: Short error type
-        message:
-          type: string
-          description: Human-readable description
-      required:
-      - error
-      - message
-    Pagination:
-      type: object
-      properties:
-        page:
-          type: integer
-        limit:
-          type: integer
-        total_results:
-          type: integer
-        total_pages:
-          type: integer
     Contact:
       type: object
       properties:
@@ -330,6 +307,29 @@ components:
           type: string
         location_country:
           type: string
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total_results:
+          type: integer
+        total_pages:
+          type: integer
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Short error type
+        message:
+          type: string
+          description: Human-readable description
+      required:
+      - error
+      - message
   responses:
     Unauthorized:
       description: Invalid or missing API key
