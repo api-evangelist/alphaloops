@@ -110,3 +110,9 @@ components:
       type: http
       scheme: bearer
       description: 'API key provided by AlphaLoops. Include as: Authorization: Bearer YOUR_API_KEY'
+x-provenance:
+  method: harvested
+  publisher: AlphaLoops FMCSA Carrier Data API
+  source: https://runalphaloops.com/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
