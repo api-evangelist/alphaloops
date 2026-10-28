@@ -1,4 +1,4 @@
-# alphaloops-fmcsa-carrier-data-api
+# AlphaLoops FMCSA Carrier Data API
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,4 +64,130 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-The carrier data layer for freight — FMCSA motor-carrier intelligence covering carrier profiles, authority &amp; insurance history, VIN-level fleet data, roadside inspections, crashes, corporate connections, decision-maker contacts, and risk/watchlist monitoring. Exposes a REST API, a live OpenAPI 3.1 c
+The carrier data layer for freight — FMCSA motor-carrier intelligence covering carrier profiles, authority & insurance history, VIN-level fleet data, roadside inspections, crashes, corporate connections, decision-maker contacts, and risk/watchlist monitoring. Exposes a REST API, a live OpenAPI 3.1 contract, a hosted MCP server with 30+ tools, and published Python/TypeScript SDKs plus a CLI.
+
+**Areas:** fmcsa api · safer web api · dot lookup · carrier data · Freight · Trucking · motor carrier · fleet intelligence · Sales Intelligence · MCP Server · Contact Enrichment · Risk Management
+
+## AlphaLoops FMCSA Carrier Data API on APIs.io
+
+Everything profiled for AlphaLoops FMCSA Carrier Data API is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/alphaloops/](https://apis.io/providers/alphaloops/)** — or go straight to one of the APIs or properties below.
+
+### APIs (5)
+
+- [AlphaLoops MCP Server](https://apis.io/apis/alphaloops/alphaloops-mcp-server/) — Hosted remote Model Context Protocol server exposing 2.7M U.S. motor carriers as tools for LLM clients (Claude Desktop/Code, Cursor, Windsurf, VS Code…
+- [AlphaLoops FMCSA Carrier Data API Carriers API](https://apis.io/apis/alphaloops/alphaloops-carriers-api/) — The Carriers API from AlphaLoops FMCSA Carrier Data API — 19 operation(s) for carriers.
+- [AlphaLoops FMCSA Carrier Data API Contacts API](https://apis.io/apis/alphaloops/alphaloops-contacts-api/) — The Contacts API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for contacts.
+- [AlphaLoops FMCSA Carrier Data API Inspections API](https://apis.io/apis/alphaloops/alphaloops-inspections-api/) — The Inspections API from AlphaLoops FMCSA Carrier Data API — 2 operation(s) for inspections.
+- [AlphaLoops FMCSA Carrier Data API Vins API](https://apis.io/apis/alphaloops/alphaloops-vins-api/) — The Vins API from AlphaLoops FMCSA Carrier Data API — 1 operation(s) for vins.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [mcp](https://apis.io/servers/alphaloops/mcp/)
+
+#### Collections (1)
+
+Postman and Open Collection request collections.
+
+- [AlphaLoops FMCSA Carrier Data API](https://apis.io/collections/alphaloops/open-alphaloops-fmcsa-carrier-data-api/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Alphaloops Fmcsa Carrier Data Api Overlay](https://apis.io/overlays/alphaloops/alphaloops-fmcsa-carrier-data-api-overlay/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Alphaloops Authentication](https://apis.io/security/alphaloops/alphaloops-authentication/)
+- [Alphaloops Domain Security](https://apis.io/security/alphaloops/alphaloops-domain-security/)
+- [Alphaloops Trust Center](https://apis.io/security/alphaloops/alphaloops-trust-center/)
+- [Alphaloops Vulnerability Disclosure](https://apis.io/security/alphaloops/alphaloops-vulnerability-disclosure/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Alphaloops Plans Pricing](https://apis.io/plans/alphaloops/alphaloops-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Alphaloops Rate Limits](https://apis.io/rate-limits/alphaloops/alphaloops-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.runalphaloops.com/)
+- [Pricing](https://runalphaloops.com/pricing)
+- [Support](https://runalphaloops.com/support)
+- [Changelog](https://runalphaloops.com/whats-new)
+- [Blog](https://runalphaloops.com/blog/)
+- [Terms of service](https://runalphaloops.com/terms)
+- [Privacy policy](https://runalphaloops.com/privacy)
+- [GitHub](https://github.com/RunAlphaLoop)
+- [Status](https://status.runalphaloops.com)
+
+## API Evangelist rating
+
+**Kin Score 64.0** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.3 |
+| Contract quality | 53.0 |
+| Contract governance | 4.5 |
+| Operational transparency | 76.3 |
+| Developer ergonomics | 73.2 |
+| Access clarity | 85.5 |
+
+**Agent readiness 40.0** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | verified |
+| OpenAPI Examples | partial |
+| Rate Limit Signal | verified |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | partial |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 30.0** — Telecommunications
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/alphaloops/](https://apis.io/providers/alphaloops/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for AlphaLoops FMCSA Carrier Data API: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/alphaloops/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
